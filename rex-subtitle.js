@@ -1,11 +1,11 @@
 function e(e, t, l, n, r, s, i) {
     try {
-        var o = e[s](i), a = o.value;
+        var o = e[s](i), u = o.value;
     } catch (e) {
         l(e);
         return;
     }
-    o.done ? t(a) : Promise.resolve(a).then(n, r);
+    o.done ? t(u) : Promise.resolve(u).then(n, r);
 }
 function t(t) {
     return function() {
@@ -13,10 +13,10 @@ function t(t) {
         return new Promise(function(r, s) {
             var i = t.apply(l, n);
             function o(t) {
-                e(i, r, s, o, a, "next", t);
+                e(i, r, s, o, u, "next", t);
             }
-            function a(t) {
-                e(i, r, s, o, a, "throw", t);
+            function u(t) {
+                e(i, r, s, o, u, "throw", t);
             }
             o(void 0);
         });
@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: "多源字幕搜索：assrt（射手网）+ OpenSubtitles + 字幕库（srtku.com）。字幕服务由 assrt.net 提供。使用前请在全局参数中填写自己的 Assrt Token 和/或 OpenSubtitles Api-Key；字幕库无需配置，默认作为第三源补充老剧、冷门剧。注意：OpenSubtitles 下载链接需实时生成，每个搜索最多生成前 3 条，会消耗账号每日下载额度（免费账号 20 次/天）。assrt 与字幕库的下载链接均为实时生成、有效期短，若下载失败请重新运行加载字幕。",
     author: 'v7777',
     site: 'https://assrt.net',
-    version: "1.1.2",
+    version: "1.1.3",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -72,7 +72,7 @@ WidgetMetadata = {
             title: '字幕库地址',
             type: 'constant',
             description: '字幕库主站地址；其域名变更时可改为新域名',
-            value: 'https://srtku.com'
+            value: 'https://zimuku.net'
         },
         {
             name: 'sourceOrder',
@@ -153,7 +153,7 @@ let o = {
     unknown: 1,
     mismatch: 2
 };
-function a(e) {
+function u(e) {
     var t, l;
     let n = parseInt(null != (t = e.episode) ? t : '', 10);
     if (Number.isNaN(n)) return null;
@@ -163,7 +163,7 @@ function a(e) {
         episode: n
     };
 }
-function u(e, t, l) {
+function a(e, t, l) {
     let n = null != e ? e : '';
     if (/e\d{1,3}\s*[-~～]\s*(?:e|ep)?\d{1,3}/i.test(n) || /第\s*\d+\s*[-~～]\s*\d+\s*集/.test(n)) return 'unknown';
     let r = /s(\d{1,2})e(\d{1,3})/i.exec(n);
@@ -174,8 +174,8 @@ function u(e, t, l) {
     if (i) return Number(i[1]) === l ? 'match' : 'mismatch';
     let o = /(?:^|[^a-z0-9])ep?(\d{1,3})(?:[^0-9]|$)/i.exec(n);
     if (o) return Number(o[1]) === l ? 'match' : 'mismatch';
-    let a = /\[(\d{1,2})\]/.exec(n);
-    return a ? Number(a[1]) === l ? 'match' : 'mismatch' : 'unknown';
+    let u = /\[(\d{1,2})\]/.exec(n);
+    return u ? Number(u[1]) === l ? 'match' : 'mismatch' : 'unknown';
 }
 function c(e) {
     var t, l, n, r, s, i;
@@ -184,7 +184,7 @@ function c(e) {
 function f(e, t) {
     return /简|繁|雙|双|中文|chs|cht|zh[-_]/i.test(`${e} ${t}`);
 }
-let d = 'https://api.opensubtitles.com/api/v1', h = "RexSubtitleAggregator v1.1.2";
+let d = 'https://api.opensubtitles.com/api/v1', h = "RexSubtitleAggregator v1.1.3";
 function p(e, t) {
     let l = {
         'Api-Key': e,
@@ -225,14 +225,14 @@ function g(e, n, r) {
                 headers: p(n, r),
                 params: ((t)=>{
                     var l, n, r, s, i, o;
-                    let a = {}, u = parseInt(null != (l = e.episode) ? l : '', 10), c = parseInt(null != (n = e.season) ? n : '', 10);
-                    Number.isNaN(u) || (a.episode_number = String(u));
+                    let u = {}, a = parseInt(null != (l = e.episode) ? l : '', 10), c = parseInt(null != (n = e.season) ? n : '', 10);
+                    Number.isNaN(a) || (u.episode_number = String(a));
                     let f = null == (r = e.imdbId) ? void 0 : r.replace(/^tt/i, '').replace(/^0+/, '');
-                    if (f && (a.imdb_id = f), a.languages = t, a.order_by = 'download_count', a.order_direction = 'desc', !f) {
+                    if (f && (u.imdb_id = f), u.languages = t, u.order_by = 'download_count', u.order_direction = 'desc', !f) {
                         let t = null == (o = e.tmdbId) ? void 0 : o.replace(/^(movie|tv)\./, '');
-                        t ? a.tmdb_id = t : a.query = (null != (s = null != (i = e.seriesName) ? i : e.title) ? s : '').trim().toLowerCase();
+                        t ? u.tmdb_id = t : u.query = (null != (s = null != (i = e.seriesName) ? i : e.title) ? s : '').trim().toLowerCase();
                     }
-                    return Number.isNaN(c) || (a.season_number = String(c)), e.type && (a.type = 'tv' === e.type ? 'episode' : 'movie'), a;
+                    return Number.isNaN(c) || (u.season_number = String(c)), e.type && (u.type = 'tv' === e.type ? 'episode' : 'movie'), u;
                 })('zh-cn,zh-tw')
             });
             return 401 === s.statusCode ? {
@@ -247,9 +247,9 @@ function g(e, n, r) {
             items: [],
             unauthorized: !0
         };
-        let h = a(e), m = h ? [
+        let h = u(e), m = h ? [
             ...f
-        ].sort((e, t)=>o[u(c(e), h.season, h.episode)] - o[u(c(t), h.season, h.episode)]) : f, g = [];
+        ].sort((e, t)=>o[a(c(e), h.season, h.episode)] - o[a(c(t), h.season, h.episode)]) : f, g = [];
         for (let e of m.slice(0, 3)){
             var $, b, y, v, w, S, k, z, N, x, _, O;
             let t = null == (b = e.attributes) || null == ($ = b.files) ? void 0 : $[0];
@@ -352,7 +352,7 @@ class b {
             null == (r = e.response) ? void 0 : r.headers,
             e.responseHeaders
         ])t && this.absorb(t);
-        let a = null != (t = n(e)) ? t : 0, u = [
+        let u = null != (t = n(e)) ? t : 0, a = [
             e.data,
             e.body,
             e.responseText,
@@ -363,11 +363,11 @@ class b {
         ];
         if (!$) {
             $ = !0;
-            let t = u.map((e, t)=>`#${t}:${typeof e}${'string' == typeof e ? `(${e.length})` : ''}`).join(' ');
-            console.log(`${l} 字幕库：请求异常探针 keys=[${Object.keys(e).join(',')}] status=${a} 候选体 ${t}`);
+            let t = a.map((e, t)=>`#${t}:${typeof e}${'string' == typeof e ? `(${e.length})` : ''}`).join(' ');
+            console.log(`${l} 字幕库：请求异常探针 keys=[${Object.keys(e).join(',')}] status=${u} 候选体 ${t}`);
         }
-        for (let e of u)if ('string' == typeof e && e.length > 0) return {
-            status: a,
+        for (let e of a)if ('string' == typeof e && e.length > 0) return {
+            status: u,
             text: e
         };
         return null;
@@ -453,14 +453,24 @@ let v = RegExp("self\\.location\\s*=\\s*([\"'])(.*?)\\1\\s*\\+\\s*stringToHex\\(
         h: n.length,
         rows: n
     };
-});
-function k(e, n, r) {
+}), k = /window\.location\.replace\(\s*(["'])(.*?)\1\s*\)/;
+function z(e, n, r) {
     return t(function*() {
-        let t = r;
-        for(let r = 0; r <= 5; r++){
-            let r, s = yield e.get(n, {
-                referer: t
-            }), i = function(e) {
+        let t = n, s = r, i = 0;
+        for(let n = 0; n <= 9; n++){
+            let n, r = yield e.get(t, {
+                referer: s
+            }), o = 200 === r.status ? function(e) {
+                if (e.length > 4000) return null;
+                let t = k.exec(e);
+                return t ? t[2] : null;
+            }(r.text) : null;
+            if (o) {
+                if (++i > 4) throw Error('字幕库跳转次数过多');
+                s = t, t = y(t, o);
+                continue;
+            }
+            let u = function(e) {
                 let t = v.exec(e);
                 if (!t) return null;
                 let l = w.exec(e);
@@ -468,12 +478,12 @@ function k(e, n, r) {
                     prefix: t[2],
                     imageB64: l ? l[2] : ''
                 };
-            }(s.text);
-            if (!i) {
-                if (s.status >= 400) throw Error(`字幕库请求失败 HTTP ${s.status} (${n})`);
-                return s.text;
+            }(r.text);
+            if (!u) {
+                if (r.status >= 400) throw Error(`字幕库请求失败 HTTP ${r.status} (${t})`);
+                return r.text;
             }
-            i.imageB64 ? (r = function(e) {
+            u.imageB64 ? (n = function(e) {
                 let t = function(e) {
                     let t = e.length, l = t > 0 ? e[0].length : 0, n = Array(l).fill(0);
                     for(let r = 0; r < l; r++)for(let l = 0; l < t; l++)e[l][r] && n[r]++;
@@ -507,17 +517,17 @@ function k(e, n, r) {
                     if (e.length < 54 || 0x42 !== e[0] || 0x4d !== e[1]) throw Error('云锁验证码不是 BMP 图片');
                     let t = new DataView(e.buffer, e.byteOffset, e.byteLength), l = t.getUint32(10, !0), n = t.getInt32(18, !0), r = t.getInt32(22, !0), s = t.getUint16(28, !0), i = t.getUint32(30, !0);
                     if (n <= 0 || 0 === r || 24 !== s || 0 !== i) throw Error(`云锁验证码 BMP 格式不支持 (w=${n} h=${r} bpp=${s} comp=${i})`);
-                    let o = Math.abs(r), a = 4 * Math.floor((3 * n + 3) / 4), u = [];
+                    let o = Math.abs(r), u = 4 * Math.floor((3 * n + 3) / 4), a = [];
                     for(let t = 0; t < o; t++){
-                        let s = l + (r > 0 ? o - 1 - t : t) * a, i = [];
+                        let s = l + (r > 0 ? o - 1 - t : t) * u, i = [];
                         for(let t = 0; t < n; t++){
                             var c, f, d;
                             let l = s + 3 * t;
                             i.push((c = e[l + 2], f = e[l + 1], d = e[l], f > c + 18 && f > d + 18 && f < 190));
                         }
-                        u.push(i);
+                        a.push(i);
                     }
-                    return u;
+                    return a;
                 }(e));
                 if (5 !== t.length) throw Error(`云锁验证码数字个数异常（识别到 ${t.length} 个）`);
                 let l = '';
@@ -544,32 +554,32 @@ function k(e, n, r) {
                     !(t < 0) && (n = n << 6 | t, (r += 6) >= 8 && (r -= 8, l.push(n >> r & 0xff)));
                 }
                 return new Uint8Array(l);
-            }(i.imageB64)), console.log(`${l} 字幕库：云锁图形验证已解出（${r.length} 位数字）`)) : (r = `${800 + Math.floor(1120 * Math.random())},${600 + Math.floor(480 * Math.random())}`, console.log(`${l} 字幕库：云锁坐标验证已应答`));
-            let o = encodeURI(y(n, i.prefix + [
-                ...r
+            }(u.imageB64)), console.log(`${l} 字幕库：云锁图形验证已解出（${n.length} 位数字）`)) : (n = `${800 + Math.floor(1120 * Math.random())},${600 + Math.floor(480 * Math.random())}`, console.log(`${l} 字幕库：云锁坐标验证已应答`));
+            let a = encodeURI(y(t, u.prefix + [
+                ...n
             ].map((e)=>e.charCodeAt(0).toString(16)).join('')));
             try {
-                yield e.get(o, {
-                    referer: n,
+                yield e.get(a, {
+                    referer: t,
                     allowRedirects: !1
                 });
-            } catch (t) {
+            } catch (l) {
                 try {
-                    yield e.get(o, {
-                        referer: n
+                    yield e.get(a, {
+                        referer: t
                     });
                 } catch (e) {}
             }
-            t = n;
+            s = t;
         }
-        throw Error('字幕库云锁验证多次未通过');
+        throw Error('字幕库验证多次未通过');
     })();
 }
-function z(e, l) {
+function N(e, l) {
     return t(function*() {
         let t = yield Widget.html.load(e), n = [], r = new Map();
         return t('tr').each((e, s)=>{
-            var i, o, a, u;
+            var i, o, u, a;
             let c = t(s), f = c.find('a[href*="/detail/"]').first();
             if (!f || 0 === f.length) return;
             let d = String(null != (i = f.attr('href')) ? i : '');
@@ -586,7 +596,7 @@ function z(e, l) {
                 return /cht|big5|繁体|繁體/.test(s) && n('zho-TW'), /chs|简体|簡體|\bgb\b/.test(s) && n('zho-CN'), /\beng(?:lish)?\b|英文/.test(s) && n('eng'), l;
             })(String(null != (o = c.html()) ? o : '')).filter((e)=>'eng' !== e);
             if (0 === h.length) return;
-            let p = String(null != (a = null != (u = f.attr('title')) ? u : f.text()) ? a : '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().replace(/\.(srt|ass|ssa|vtt|zip|rar|7z)$/i, '');
+            let p = String(null != (u = null != (a = f.attr('title')) ? a : f.text()) ? u : '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().replace(/\.(srt|ass|ssa|vtt|zip|rar|7z)$/i, '');
             if (!p) return;
             let m = y(l, d), g = r.get(m);
             if (g) {
@@ -604,7 +614,7 @@ function z(e, l) {
 }
 loadSubtitle = (e)=>t(function*() {
         var c, d, h, p;
-        let $ = Math.max(1, Math.min(15, parseInt(null != (c = e.resultCount) ? c : '10', 10) || 10)), v = null != (d = e.sourceOrder) ? d : 'assrt-first', w = !!(null != (h = e.assrtToken) ? h : '').trim(), S = !!(null != (p = e.osApiKey) ? p : '').trim(), N = 'os-only' === v ? [
+        let $ = Math.max(1, Math.min(15, parseInt(null != (c = e.resultCount) ? c : '10', 10) || 10)), v = null != (d = e.sourceOrder) ? d : 'assrt-first', w = !!(null != (h = e.assrtToken) ? h : '').trim(), S = !!(null != (p = e.osApiKey) ? p : '').trim(), k = 'os-only' === v ? [
             'os'
         ] : 'assrt-only' === v ? [
             'assrt'
@@ -619,13 +629,13 @@ loadSubtitle = (e)=>t(function*() {
             'os',
             'zimuku'
         ];
-        if (0 === N.filter((e)=>'zimuku' === e || ('assrt' === e ? w : S)).length) return console.error(`${l} 当前顺序下没有可用的字幕源：请在模块的全局参数中填写 Assrt Token 或 OpenSubtitles Api-Key，或把字幕源顺序改为包含字幕库，本次返回空结果`), [];
+        if (0 === k.filter((e)=>'zimuku' === e || ('assrt' === e ? w : S)).length) return console.error(`${l} 当前顺序下没有可用的字幕源：请在模块的全局参数中填写 Assrt Token 或 OpenSubtitles Api-Key，或把字幕源顺序改为包含字幕库，本次返回空结果`), [];
         let x = {
             assrt: 'assrt',
             os: 'OpenSubtitles',
             zimuku: '字幕库'
         }, _ = [];
-        for (let c of N){
+        for (let c of k){
             if (_.length >= $) break;
             if ('assrt' === c && !w) {
                 console.log(`${l} 跳过 assrt：未填写 Assrt Token`);
@@ -640,19 +650,19 @@ loadSubtitle = (e)=>t(function*() {
                     return t(function*() {
                         var c, d, h, p, m, g, $, b, y, v, w, S, k, z, N, x, _, O, A, C, W, T, U, M;
                         let j = (null != (c = e.assrtToken) ? c : '').trim(), I = (e.assrtBaseUrl || 'https://api.assrt.net/v1').replace(/\/$/, ''), P = function(e) {
-                            var t, l, n, r, s, o, a;
-                            let u = (null != (t = e.seriesName) ? t : '').trim(), c = (null != (l = e.title) ? l : '').trim(), f = u || c, d = [], h = (e)=>{
+                            var t, l, n, r, s, o, u;
+                            let a = (null != (t = e.seriesName) ? t : '').trim(), c = (null != (l = e.title) ? l : '').trim(), f = a || c, d = [], h = (e)=>{
                                 let t = e.trim();
                                 t.length >= 3 && !d.includes(t) && d.push(t);
                             };
                             if (!f) return d;
                             let p = parseInt(null != (n = e.season) ? n : '', 10), m = parseInt(null != (r = e.episode) ? r : '', 10), g = ('tv' === e.type || !Number.isNaN(m)) && !Number.isNaN(m), $ = Number.isNaN(p) ? 1 : p, b = '', y = null != (s = null != (o = e.videoUrl) ? o : e.link) ? s : '';
                             if (y) try {
-                                let e = decodeURIComponent(null != (a = y.split(/[?#]/)[0].split('/').pop()) ? a : '').replace(/\.[a-z0-9]{2,5}$/i, '');
+                                let e = decodeURIComponent(null != (u = y.split(/[?#]/)[0].split('/').pop()) ? u : '').replace(/\.[a-z0-9]{2,5}$/i, '');
                                 e.length >= 10 && (b = e);
                             } catch (e) {}
                             return g ? (h(`${f} S${i($)}E${i(m)}`), b && h(b), h(f), h(`${f} 第${$}季第${m}集`)) : (h(f), b && h(b), 'tv' !== e.type || Number.isNaN(p) || h(`${f} 第${p}季`)), c && c !== f && h(c), d.slice(0, 4);
-                        }(e), L = a(e);
+                        }(e), L = u(e);
                         if (0 === P.length) return console.warn(`${l} assrt 跳过：没有可用的搜索关键词（标题为空）`), [];
                         let q = [], E = 0, B = !1;
                         for(let e = 0; e < P.length && !(E >= 5); e++){
@@ -693,15 +703,15 @@ loadSubtitle = (e)=>t(function*() {
                         L && (q = [
                             ...q
                         ].sort((e, t)=>{
-                            var l, n, r, s, i, a;
-                            return o[u(`${null != (l = e.native_name) ? l : ''} ${null != (n = e.videoname) ? n : ''} ${null != (r = e.filename) ? r : ''}`, L.season, L.episode)] - o[u(`${null != (s = t.native_name) ? s : ''} ${null != (i = t.videoname) ? i : ''} ${null != (a = t.filename) ? a : ''}`, L.season, L.episode)];
+                            var l, n, r, s, i, u;
+                            return o[a(`${null != (l = e.native_name) ? l : ''} ${null != (n = e.videoname) ? n : ''} ${null != (r = e.filename) ? r : ''}`, L.season, L.episode)] - o[a(`${null != (s = t.native_name) ? s : ''} ${null != (i = t.videoname) ? i : ''} ${null != (u = t.filename) ? u : ''}`, L.season, L.episode)];
                         }));
                         let K = [], H = new Set(), R = (e)=>{
                             !e.url || H.has(e.url) || (H.add(e.url), K.push(e));
                         }, D = 0, F = 0, J = 0;
                         for (let e of q){
                             let i = null != (d = null == (y = e.lang) ? void 0 : y.desc) ? d : '中文', o = null != (h = null != (p = null != (m = e.id) ? m : e.sub_id) ? p : e.sid) ? h : e.subId;
-                            if (L && 'mismatch' === u(`${null != (g = e.native_name) ? g : ''} ${null != ($ = e.videoname) ? $ : ''} ${null != (b = e.filename) ? b : ''}`, L.season, L.episode)) {
+                            if (L && 'mismatch' === a(`${null != (g = e.native_name) ? g : ''} ${null != ($ = e.videoname) ? $ : ''} ${null != (b = e.filename) ? b : ''}`, L.season, L.episode)) {
                                 F++;
                                 continue;
                             }
@@ -759,22 +769,22 @@ loadSubtitle = (e)=>t(function*() {
                                         console.warn(`${l} assrt 详情失败 (id=${o}): status=${s.status} ${null != (_ = s.errmsg) ? _ : ''}`);
                                         continue;
                                     }
-                                    let a = null == s || null == (x = s.sub) || null == (N = x.subs) ? void 0 : N[0], c = null != (k = null == a ? void 0 : a.filelist) ? k : [];
+                                    let u = null == s || null == (x = s.sub) || null == (N = x.subs) ? void 0 : N[0], c = null != (k = null == u ? void 0 : u.filelist) ? k : [];
                                     c.length > 0 ? c.forEach((e, t)=>{
                                         var l, n, r;
-                                        L && 'mismatch' === u(null != (l = e.f) ? l : '', L.season, L.episode) ? F++ : R({
+                                        L && 'mismatch' === a(null != (l = e.f) ? l : '', L.season, L.episode) ? F++ : R({
                                             id: `assrt:${o}:${t}`,
                                             title: e.f,
-                                            lang: null != (n = null == a || null == (r = a.lang) ? void 0 : r.desc) ? n : i,
+                                            lang: null != (n = null == u || null == (r = u.lang) ? void 0 : r.desc) ? n : i,
                                             count: 0,
                                             url: e.url
                                         });
-                                    }) : (null == a ? void 0 : a.url) && !(L && 'mismatch' === u(null != (z = a.filename) ? z : '', L.season, L.episode)) && R({
+                                    }) : (null == u ? void 0 : u.url) && !(L && 'mismatch' === a(null != (z = u.filename) ? z : '', L.season, L.episode)) && R({
                                         id: `assrt:${o}`,
-                                        title: null != (O = null != (A = null != (C = a.filename) ? C : e.native_name) ? A : e.videoname) ? O : '字幕',
-                                        lang: null != (W = null == a || null == (T = a.lang) ? void 0 : T.desc) ? W : i,
+                                        title: null != (O = null != (A = null != (C = u.filename) ? C : e.native_name) ? A : e.videoname) ? O : '字幕',
+                                        lang: null != (W = null == u || null == (T = u.lang) ? void 0 : T.desc) ? W : i,
                                         count: 0,
-                                        url: a.url
+                                        url: u.url
                                     });
                                 } catch (e) {
                                     console.warn(`${l} assrt 详情请求异常 (id=${o}): ${s(e)}`);
@@ -783,7 +793,7 @@ loadSubtitle = (e)=>t(function*() {
                         }
                         let V = 0;
                         if (K.some((e)=>f(e.lang, e.title))) for(let e = K.length - 1; e >= 0; e--)U = K[e].lang, !f(U, M = K[e].title) && /英|english|\beng\b/i.test(`${U} ${M}`) && (K.splice(e, 1), V++);
-                        return L && K.sort((e, t)=>o[u(e.title, L.season, L.episode)] - o[u(t.title, L.season, L.episode)]), console.log(`${l} assrt：搜索 ${E} 次、详情 ${D} 次 → ${K.length} 条${L && F > 0 ? `（按集数过滤掉 ${F} 条其他集字幕）` : ''}${J > 0 ? `（跳过 ${J} 条无 id 结果）` : ''}${V > 0 ? `（过滤掉 ${V} 条纯英文字幕）` : ''}`), K;
+                        return L && K.sort((e, t)=>o[a(e.title, L.season, L.episode)] - o[a(t.title, L.season, L.episode)]), console.log(`${l} assrt：搜索 ${E} 次、详情 ${D} 次 → ${K.length} 条${L && F > 0 ? `（按集数过滤掉 ${F} 条其他集字幕）` : ''}${J > 0 ? `（跳过 ${J} 条无 id 结果）` : ''}${V > 0 ? `（过滤掉 ${V} 条纯英文字幕）` : ''}`), K;
                     })();
                 }(e) : 'os' === c ? yield function(e) {
                     return t(function*() {
@@ -793,45 +803,45 @@ loadSubtitle = (e)=>t(function*() {
                     })();
                 }(e) : yield function(e) {
                     return t(function*() {
-                        let n = (e.zimukuBaseUrl || 'https://srtku.com').replace(/\/$/, ''), c = function(e) {
+                        let n = (e.zimukuBaseUrl || 'https://zimuku.net').replace(/\/$/, ''), c = function(e) {
                             var t, l;
                             let n = [
                                 ...new Set([
                                     null != (t = e.seriesName) ? t : '',
                                     null != (l = e.title) ? l : ''
                                 ].map((e)=>e.trim()).filter(Boolean))
-                            ], r = a(e), s = [];
+                            ], r = u(e), s = [];
                             for (let e of n)r && /[a-z]/i.test(e) && s.push(`${e}.S${i(r.season)}`), s.push(e);
                             return [
                                 ...new Set(s)
                             ].slice(0, 3);
                         }(e);
                         if (0 === c.length) return console.warn(`${l} 字幕库跳过：没有可用的搜索关键词（标题为空）`), [];
-                        let f = new b(), d = a(e), h = [], p = '';
+                        let f = new b(), d = u(e), h = [], p = '';
                         for (let e of c){
-                            let r = `${n}/search?q=${encodeURIComponent(e)}`, i = yield k(f, r, n);
+                            let r = `${n}/search?q=${encodeURIComponent(e)}`, i = yield z(f, r, n);
                             if ((h = yield function(e, n, r, i) {
                                 return t(function*() {
-                                    let t = yield z(n, r);
+                                    let t = yield N(n, r);
                                     if (t.length > 0) return t;
-                                    let o = yield Widget.html.load(n), a = [];
+                                    let o = yield Widget.html.load(n), u = [];
                                     o('.item a').each((e, t)=>{
                                         var l;
                                         let n = String(null != (l = o(t).attr('href')) ? l : '');
-                                        !n || n.includes('/detail/') || a.includes(n) || a.push(n);
+                                        !n || n.includes('/detail/') || u.includes(n) || u.push(n);
                                     });
-                                    let u = [];
-                                    for (let t of a.slice(0, 2)){
+                                    let a = [];
+                                    for (let t of u.slice(0, 2)){
                                         let n = y(r, t);
                                         try {
-                                            let t = yield k(e, n, i);
-                                            u.push(...yield z(t, n));
+                                            let t = yield z(e, n, i);
+                                            a.push(...yield N(t, n));
                                         } catch (e) {
                                             console.warn(`${l} 字幕库：剧集页解析失败 (${t}): ${s(e)}`);
                                         }
-                                        if (u.length >= 10) break;
+                                        if (a.length >= 10) break;
                                     }
-                                    return u;
+                                    return a;
                                 })();
                             }(f, i, r, n)).length > 0) {
                                 p = e;
@@ -839,23 +849,23 @@ loadSubtitle = (e)=>t(function*() {
                             }
                         }
                         if (0 === h.length) return console.log(`${l} 字幕库：无结果（关键词：${c.join(' / ')}）`), [];
-                        d && (h = h.filter((e)=>'mismatch' !== u(e.release, d.season, d.episode))).sort((e, t)=>o[u(e.release, d.season, d.episode)] - o[u(t.release, d.season, d.episode)]);
+                        d && (h = h.filter((e)=>'mismatch' !== a(e.release, d.season, d.episode))).sort((e, t)=>o[a(e.release, d.season, d.episode)] - o[a(t.release, d.season, d.episode)]);
                         let m = [], g = 0;
                         for (let e of h){
                             if (g >= 5) break;
                             g++;
                             try {
                                 g > 1 && (yield r(200));
-                                let t = yield k(f, e.detailUrl, n), s = (yield Widget.html.load(t))('a#down1').attr('href');
+                                let t = yield z(f, e.detailUrl, n), s = (yield Widget.html.load(t))('a#down1').attr('href');
                                 if (!s) {
                                     console.warn(`${l} 字幕库：详情页没有下载入口 (${e.release})`);
                                     continue;
                                 }
-                                let i = y(e.detailUrl, String(s)), o = yield k(f, i, e.detailUrl), a = yield Widget.html.load(o), u = '';
-                                if (a('a').each((e, t)=>{
+                                let i = y(e.detailUrl, String(s)), o = yield z(f, i, e.detailUrl), u = yield Widget.html.load(o), a = '';
+                                if (u('a').each((e, t)=>{
                                     var l, n;
-                                    u || 'nofollow' === String(null != (l = a(t).attr('rel')) ? l : '').toLowerCase() && (u = String(null != (n = a(t).attr('href')) ? n : ''));
-                                }), !u) {
+                                    a || 'nofollow' === String(null != (l = u(t).attr('rel')) ? l : '').toLowerCase() && (a = String(null != (n = u(t).attr('href')) ? n : ''));
+                                }), !a) {
                                     console.warn(`${l} 字幕库：下载页没有最终链接 (${e.release})`);
                                     continue;
                                 }
@@ -865,7 +875,7 @@ loadSubtitle = (e)=>t(function*() {
                                     title: e.release,
                                     lang: e.langs.size > 1 ? '中文' : e.langs.has('zho-CN') ? '简体中文' : '繁体中文',
                                     count: 0,
-                                    url: y(i, u)
+                                    url: y(i, a)
                                 });
                             } catch (t) {
                                 console.warn(`${l} 字幕库：解析下载链接失败 (${e.release}): ${s(t)}`);
@@ -882,13 +892,13 @@ loadSubtitle = (e)=>t(function*() {
         let O = new Set(), A = _.filter((e)=>!(!e.url || O.has(e.url)) && (O.add(e.url), !0)).slice(0, $);
         return console.log(`${l} 共返回 ${A.length} 条字幕（上限 ${$}）`), A;
     })();
-let N = {
+let x = {
     ass: 50,
     srt: 45,
     ssa: 30,
     vtt: 15
-}, x = /chs|简|zh[-_.]?cn/i, _ = /cht|繁|zh[-_.]?tw|big5/i, O = /双语|中英|bilingual|chs[&+.]?eng|cht[&+.]?eng/i, A = /\beng\b|english|英文/i;
-function C(e) {
+}, _ = /chs|简|zh[-_.]?cn/i, O = /cht|繁|zh[-_.]?tw|big5/i, A = /双语|中英|bilingual|chs[&+.]?eng|cht[&+.]?eng/i, C = /\beng\b|english|英文/i;
+function W(e) {
     var t;
     if (!e) return null;
     let l = null != (t = e.match(/s(\d{1,2})[\s._-]*e(\d{1,3})/i)) ? t : e.match(/(\d{1,2})x(\d{1,3})/);
@@ -896,28 +906,28 @@ function C(e) {
 }
 resolveSubtitleArchive = (e)=>t(function*() {
         var t, n, r, s, i;
-        let o, a = null != (t = e.subtitleFiles) ? t : e.files;
-        if (!a) return null;
-        let u = [];
+        let o, u = null != (t = e.subtitleFiles) ? t : e.files;
+        if (!u) return null;
+        let a = [];
         try {
-            u = JSON.parse(a);
+            a = JSON.parse(u);
         } catch (e) {
             return null;
         }
-        let c = u.filter((e)=>e.extension in N);
+        let c = a.filter((e)=>e.extension in x);
         if (0 === c.length) return null;
         if (1 === c.length) return c[0].path;
         let f = (null != (n = null != (r = e.subtitleName) ? r : e.archiveName) ? n : '').toLowerCase().replace(/\.[a-z0-9]{2,5}$/, '').split(/[^a-z0-9\u4e00-\u9fff]+/).filter((e)=>e.length >= 3).slice(0, 3), d = {
-            episode: null != (s = C(e.subtitleName)) ? s : C(e.archiveName),
+            episode: null != (s = W(e.subtitleName)) ? s : W(e.archiveName),
             pref: (o = (null != (i = e.subtitleLanguage) ? i : '').toLowerCase()) ? /zh-tw|cht|繁|traditional/.test(o) ? 'cht' : /zh-cn|chs|简|simplified/.test(o) ? 'chs' : /zh|中文|chinese/.test(o) ? 'zh' : 'other' : null,
             titleTokens: f
         }, h = c.map((e)=>({
                 file: e,
                 score: function(e, t) {
                     var l;
-                    let n = null != (l = N[e.extension]) ? l : 0, r = e.name.toLowerCase(), s = O.test(r), i = x.test(r), o = _.test(r);
-                    if ('chs' === t.pref ? (i && (n += 30), s && (n += 25), !o || i || s || (n -= 15)) : 'cht' === t.pref ? (o && (n += 30), s && (n += 25), !i || o || s || (n -= 15)) : 'zh' === t.pref && ((i || o) && (n += 20), s && (n += 25)), ('chs' === t.pref || 'cht' === t.pref || 'zh' === t.pref) && !i && !o && !s && A.test(r) && (n -= 20), t.episode) {
-                        let l = C(e.name);
+                    let n = null != (l = x[e.extension]) ? l : 0, r = e.name.toLowerCase(), s = A.test(r), i = _.test(r), o = O.test(r);
+                    if ('chs' === t.pref ? (i && (n += 30), s && (n += 25), !o || i || s || (n -= 15)) : 'cht' === t.pref ? (o && (n += 30), s && (n += 25), !i || o || s || (n -= 15)) : 'zh' === t.pref && ((i || o) && (n += 20), s && (n += 25)), ('chs' === t.pref || 'cht' === t.pref || 'zh' === t.pref) && !i && !o && !s && C.test(r) && (n -= 20), t.episode) {
+                        let l = W(e.name);
                         l === t.episode ? n += 60 : l && (n -= 80);
                     }
                     for (let e of t.titleTokens)r.includes(e) && (n += 8);
