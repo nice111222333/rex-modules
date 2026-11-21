@@ -45,7 +45,7 @@ WidgetMetadata = {
     description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.1",
+    version: "0.1.2",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -67,7 +67,7 @@ WidgetMetadata = {
             name: 'libraryRoot',
             title: '整理根目录',
             type: 'input',
-            description: '根目录下的文件夹名，女优文件夹建在它里面。默认「艺术」；留空 = 女优文件夹直接放根目录',
+            description: '根目录下的文件夹名，女优文件夹建在它里面。留空 = 默认「艺术」；填「/」= 女优文件夹直接放根目录',
             value: '艺术'
         },
         {
@@ -430,10 +430,10 @@ loadLibrary = (e)=>t(function*() {
         yield d(e);
         let w = (null != (a = e.organizeMode) ? a : 'do') === 'report' ? 'report' : 'do', P = yield (b = 'do' === w, t(function*() {
             var t;
-            let r = (null != (t = e.libraryRoot) ? t : '艺术').trim();
-            if (!r) return '0';
-            let n = (yield j(e, '0')).find((e)=>e.isDir && e.name === r);
-            return n ? n.fid : b ? x(e, '0', r) : '';
+            let r = (null != (t = e.libraryRoot) ? t : '').trim();
+            if ('/' === r) return '0';
+            let n = '' === r ? '艺术' : r, i = (yield j(e, '0')).find((e)=>e.isDir && e.name === n);
+            return i ? i.fid : b ? x(e, '0', n) : '';
         })()), W = yield t(function*() {
             let t = [
                 '0'
