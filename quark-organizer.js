@@ -45,7 +45,7 @@ WidgetMetadata = {
     description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹，整理后自动清理艺术内的垃圾文件和空文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.6",
+    version: "0.1.7",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -124,7 +124,7 @@ function o(e) {
     return Object.keys(e).map((t)=>`${encodeURIComponent(t)}=${encodeURIComponent(e[t])}`).join('&');
 }
 function a(e) {
-    return e.length > 3 ? e.replace(/^0+(?=\d)/, '') : e;
+    return e.length > 4 ? e.replace(/^0+(?=\d)/, '') : e;
 }
 function u(e) {
     var t;
@@ -135,14 +135,21 @@ function u(e) {
     if (i) return `${i[1]}${i[2]}${i[3]}`;
     let l = /(?:^|[^A-Z])([A-Z]{2,6})-S(\d{1,3})(?![0-9])/.exec(r);
     if (l) return `${l[1]}-S${l[2]}`;
-    let o = /(?:^|[^A-Z])([A-Z]{2,6})-(\d{2,6})(?![0-9])/.exec(r);
+    let o = /(?:^|[^A-Z])([A-Z]{2,6})-\s*(\d{2,6})(?![0-9])/.exec(r);
     if (o) return `${o[1]}-${a(o[2])}`;
     let u = /(?:^|[^A-Z0-9])([A-Z]{2,6})(\d{3,6})(?![0-9])/.exec(r);
-    return u ? `${u[1]}-${a(u[2])}` : null;
+    if (u) return `${u[1]}-${a(u[2])}`;
+    for (let e of r.matchAll(/(?:^|[^A-Z])([A-Z]{2,6})\s+(\d{3,5})(?![0-9])/g))if (![
+        '720',
+        '1080',
+        '1440',
+        '2160'
+    ].includes(e[2])) return `${e[1]}-${a(e[2])}`;
+    return null;
 }
 function s(e) {
     let t = String(null != e ? e : '').toUpperCase();
-    return /(?:^|[^A-Z])FC2[- ]?PPV[- ]?\d{5,7}/.test(t) || /(?:^|[^0-9])\d{6}[-_]\d{3}(?![0-9])/.test(t) || /(?:^|[^A-Z])[A-Z]{2,6}-S\d{1,3}(?![0-9])/.test(t) || /(?:^|[^A-Z])[A-Z]{2,6}-\d{2,6}(?![0-9])/.test(t);
+    return /(?:^|[^A-Z])FC2[- ]?PPV[- ]?\d{5,7}/.test(t) || /(?:^|[^0-9])\d{6}[-_]\d{3}(?![0-9])/.test(t) || /(?:^|[^A-Z])[A-Z]{2,6}-S\d{1,3}(?![0-9])/.test(t) || /(?:^|[^A-Z])[A-Z]{2,6}-\s*\d{2,6}(?![0-9])/.test(t);
 }
 function d(...e) {
     for (let t of e){
@@ -404,7 +411,7 @@ function w(e, r) {
         });
     })();
 }
-function O(e, r, l) {
+function A(e, r, l) {
     return t(function*() {
         let t = (yield j(e, r)).find((e)=>e.isDir && e.name === l);
         if (t) return t.fid;
@@ -434,11 +441,11 @@ function O(e, r, l) {
         return console.log(`${n} 文件夹「${l}」创建后多次确认仍未找到，本次先不移动`), '';
     })();
 }
-let A = 'org_work_';
+let O = 'org_work_';
 function P(e) {
     return t(function*() {
         try {
-            let l = yield Widget.storage.get(A + e.toUpperCase());
+            let l = yield Widget.storage.get(O + e.toUpperCase());
             if ('string' == typeof l && l) {
                 let e = JSON.parse(l);
                 if (e && 'object' == typeof e) {
@@ -482,7 +489,7 @@ function W(e, r) {
             console.log(`${n} JavDB 查询 ${r} 失败: ${i(e)}`);
         }
         if (u) try {
-            yield Widget.storage.set(A + r.toUpperCase(), JSON.stringify({
+            yield Widget.storage.set(O + r.toUpperCase(), JSON.stringify({
                 a: u.actress,
                 c: u.cover,
                 t: u.title,
@@ -500,7 +507,7 @@ loadLibrary = (e)=>t(function*() {
             let r = (null != (t = e.libraryRoot) ? t : '').trim();
             if ('/' === r) return '0';
             let n = '' === r ? '艺术' : r, i = (yield j(e, '0')).find((e)=>e.isDir && e.name === n);
-            return i ? i.fid : c ? O(e, '0', n) : '';
+            return i ? i.fid : c ? A(e, '0', n) : '';
         })()), { videos: m, folders: y } = yield t(function*() {
             let t = [
                 {
@@ -578,7 +585,7 @@ loadLibrary = (e)=>t(function*() {
             else {
                 let r = [];
                 try {
-                    let n = h ? yield O(e, h, y.actress) : '';
+                    let n = h ? yield A(e, h, y.actress) : '';
                     if (s && !p && (yield function(e, r, n) {
                         return t(function*() {
                             yield S(e, 'POST', '/file/rename', {}, {
@@ -615,7 +622,7 @@ loadLibrary = (e)=>t(function*() {
                 status: n
             });
         }
-        let A = new Map();
+        let O = new Map();
         if ('do' === g) {
             let t = new Set(h ? [
                 h
@@ -642,12 +649,12 @@ loadLibrary = (e)=>t(function*() {
             }
             for (let r of (o.length > 0 && console.log(`${n} 已清理垃圾文件 ${o.length} 个：${o.join('、')}`), y.filter((e)=>e.fid !== h && !!(t.has(e.fid) && !C.has(e.name) || s(e.name) || '0' === e.parentFid && C.has(e.name))).sort((e, t)=>t.depth - e.depth).slice(0, 60)))try {
                 let t = yield j(e, r.fid);
-                0 === t.length && (yield w(e, r.fid), A.set(r.fid, r.name));
+                0 === t.length && (yield w(e, r.fid), O.set(r.fid, r.name));
             } catch (e) {
                 console.log(`${n} 空文件夹清理跳过「${r.name}」: ${i(e)}`);
             }
-            A.size > 0 && console.log(`${n} 已清理空文件夹 ${A.size} 个：${[
-                ...A.values()
+            O.size > 0 && console.log(`${n} 已清理空文件夹 ${O.size} 个：${[
+                ...O.values()
             ].join('、')}`);
         }
         let q = x.map(({ code: e, files: t, info: r, status: n })=>{
@@ -655,7 +662,7 @@ loadLibrary = (e)=>t(function*() {
             let l = n, o = t.map((e)=>{
                 var t;
                 return null != (t = e.parentFid) ? t : '';
-            }).filter((e, t, r)=>e && A.has(e) && r.indexOf(e) === t).map((e)=>A.get(e));
+            }).filter((e, t, r)=>e && O.has(e) && r.indexOf(e) === t).map((e)=>O.get(e));
             o.length > 0 && (l += `；已清理空文件夹「${o.join('」、「')}」`);
             let a = [
                 `番号：${e}`,
