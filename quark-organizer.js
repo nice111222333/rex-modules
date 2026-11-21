@@ -45,7 +45,7 @@ WidgetMetadata = {
     description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹，整理后自动清理艺术内的垃圾文件和空文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.7",
+    version: "0.1.8",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
