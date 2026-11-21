@@ -42,10 +42,10 @@ function r(e) {
 WidgetMetadata = {
     id: 'v7777-quark-organizer',
     title: '夸克AV整理',
-    description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
+    description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹，整理后自动删除空的番号文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.2",
+    version: "0.1.3",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -138,13 +138,13 @@ function u(...e) {
     }
     return null;
 }
-let s = 'https://javdb.com', c = 'javdb_cookie_mirror';
-function d(e) {
+let s = 'https://javdb.com', d = 'javdb_cookie_mirror';
+function c(e) {
     return t(function*() {
         try {
             if (!e || 'string' != typeof e.javdbCookie) return;
             let t = e.javdbCookie.trim();
-            t ? yield Widget.storage.set(c, t) : yield Widget.storage.remove(c);
+            t ? yield Widget.storage.set(d, t) : yield Widget.storage.remove(d);
         } catch (e) {}
     })();
 }
@@ -152,7 +152,7 @@ function f(e) {
     return t(function*() {
         if (e && 'string' == typeof e.javdbCookie && e.javdbCookie.trim()) return e.javdbCookie.trim();
         try {
-            let e = yield Widget.storage.get(c);
+            let e = yield Widget.storage.get(d);
             if ('string' == typeof e && e.trim()) return e.trim();
         } catch (e) {}
         return '';
@@ -184,14 +184,14 @@ function g(e, r) {
         0 === n.length && (n = t('.movie-list a.box, .grid a.box'));
         let i = [], o = new Set();
         return n.each((e, n)=>{
-            var s, c, d, f, p;
+            var s, d, c, f, p;
             let g = t(n), m = l(r, null != (s = g.attr('href')) ? s : '');
             if (!m || o.has(m)) return;
             o.add(m);
-            let y = g.find('.video-title strong').first().text().trim(), h = (null != (c = g.attr('title')) ? c : '').trim(), v = g.find('.video-title').first().text().trim(), $ = null != (d = a(y)) ? d : u(h, v), k = null != (f = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? f : '';
+            let h = g.find('.video-title strong').first().text().trim(), y = (null != (d = g.attr('title')) ? d : '').trim(), v = g.find('.video-title').first().text().trim(), $ = null != (c = a(h)) ? c : u(y, v), k = null != (f = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? f : '';
             k = l(r, k), i.push({
                 code: $,
-                title: h || v || $ || m,
+                title: y || v || $ || m,
                 link: m,
                 cover: k
             });
@@ -201,7 +201,7 @@ function g(e, r) {
 function m(e) {
     return e.replace(/[:：\s]/g, '');
 }
-function y(e) {
+function h(e) {
     let t = e('nav.panel.movie-panel-info').first(), r = [];
     if (0 === t.length) return r;
     let n = t.find('> div, .panel-block'), i = new Set();
@@ -220,11 +220,11 @@ function y(e) {
         });
     }), r;
 }
-function h(e, t) {
+function y(e, t) {
     return e.find((e)=>t.includes(e.label));
 }
 function v(e, t) {
-    let r = h(t, [
+    let r = y(t, [
         '演員',
         '演员'
     ]);
@@ -286,7 +286,7 @@ let C = new Set([
 function _(e, n, i, l, a) {
     return t(function*() {
         var u, s;
-        let c, d = yield t(function*() {
+        let d, c = yield t(function*() {
             var t;
             let r = (null != (t = e.quarkCookie) ? t : '').trim();
             if (!r) return '';
@@ -298,21 +298,21 @@ function _(e, n, i, l, a) {
             } catch (e) {}
             return r;
         })();
-        if (!d) throw Error('未填写夸克网盘 Cookie（模块全局参数 quarkCookie）');
+        if (!c) throw Error('未填写夸克网盘 Cookie（模块全局参数 quarkCookie）');
         let f = o(r({
             pr: 'ucpro',
             fr: 'pc'
         }, l)), p = `https://drive.quark.cn/1/clouddrive${i}?${f}`, g = {
-            Cookie: d,
+            Cookie: c,
             Accept: 'application/json, text/plain, */*',
             Referer: 'https://pan.quark.cn',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
         };
-        c = 'GET' === n ? yield Widget.http.get(p, {
+        d = 'GET' === n ? yield Widget.http.get(p, {
             headers: g
         }) : yield Widget.http.post(p, null != a ? a : {}, {
             headers: g
-        }), yield (u = null == c ? void 0 : c.headers, t(function*() {
+        }), yield (u = null == d ? void 0 : d.headers, t(function*() {
             try {
                 var t, r;
                 let n = (null != (t = e.quarkCookie) ? t : '').trim();
@@ -322,7 +322,7 @@ function _(e, n, i, l, a) {
                 Array.isArray(i) || (i = [
                     i
                 ]);
-                let l = d, o = !1;
+                let l = c, o = !1;
                 for (let e of i){
                     let t = String(e).split(';')[0], r = t.indexOf('=');
                     if (r <= 0) continue;
@@ -338,19 +338,19 @@ function _(e, n, i, l, a) {
                 o && (yield Widget.storage.set($, l), yield Widget.storage.set(k, b(n)));
             } catch (e) {}
         })());
-        let m = 'number' == typeof (null == c ? void 0 : c.statusCode) ? c.statusCode : 200;
+        let m = 'number' == typeof (null == d ? void 0 : d.statusCode) ? d.statusCode : 200;
         if (m >= 400) throw Error(`HTTP ${m}: 夸克接口 ${i}`);
-        let y = function(e) {
+        let h = function(e) {
             if (null == e) return null;
             if ('object' == typeof e) return e;
             if ('string' == typeof e) try {
                 return JSON.parse(e);
             } catch (e) {}
             return null;
-        }(null == c ? void 0 : c.data);
-        if (!y) throw Error(`夸克接口 ${i} 返回了无法解析的内容`);
-        if ('number' == typeof y.status && y.status >= 400 || void 0 !== y.code && 0 !== y.code) throw Error(`夸克接口 ${i} 出错: ${null != (s = y.message) ? s : `code=${y.code}`}`);
-        return y;
+        }(null == d ? void 0 : d.data);
+        if (!h) throw Error(`夸克接口 ${i} 返回了无法解析的内容`);
+        if ('number' == typeof h.status && h.status >= 400 || void 0 !== h.code && 0 !== h.code) throw Error(`夸克接口 ${i} 出错: ${null != (s = h.message) ? s : `code=${h.code}`}`);
+        return h;
     })();
 }
 function j(e, r) {
@@ -373,8 +373,8 @@ function j(e, r) {
                 category: 'number' == typeof e.category ? e.category : 0,
                 isDir: !1 === e.file
             });
-            let c = null == u || null == (l = u.metadata) ? void 0 : l._total;
-            if (0 === s.length || 'number' == typeof c && t.length >= c || s.length < 100) break;
+            let d = null == u || null == (l = u.metadata) ? void 0 : l._total;
+            if (0 === s.length || 'number' == typeof d && t.length >= d || s.length < 100) break;
         }
         return t;
     })();
@@ -426,31 +426,41 @@ function S(e) {
     })();
 }
 loadLibrary = (e)=>t(function*() {
-        var a, c, m, h, $, k, b;
-        yield d(e);
-        let w = (null != (a = e.organizeMode) ? a : 'do') === 'report' ? 'report' : 'do', P = yield (b = 'do' === w, t(function*() {
+        var a, d, m, y, $, k;
+        yield c(e);
+        let b = (null != (a = e.organizeMode) ? a : 'do') === 'report' ? 'report' : 'do', w = yield (k = 'do' === b, t(function*() {
             var t;
             let r = (null != (t = e.libraryRoot) ? t : '').trim();
             if ('/' === r) return '0';
             let n = '' === r ? '艺术' : r, i = (yield j(e, '0')).find((e)=>e.isDir && e.name === n);
-            return i ? i.fid : b ? x(e, '0', n) : '';
-        })()), W = yield t(function*() {
+            return i ? i.fid : k ? x(e, '0', n) : '';
+        })()), { videos: P, folders: W } = yield t(function*() {
             let t = [
-                '0'
-            ], l = [], o = new Map(), a = new Set(), u = 0, s = 0;
-            for(; t.length > 0 && u < 120 && s < 8000;){
-                let d, f = t.shift();
-                u++;
+                {
+                    fid: '0',
+                    depth: 0
+                }
+            ], l = [], o = [], a = new Map(), u = new Set(), s = 0, d = 0;
+            for(; t.length > 0 && s < 120 && d < 8000;){
+                let f, { fid: p, depth: g } = t.shift();
+                s++;
                 try {
-                    d = yield j(e, f);
+                    f = yield j(e, p);
                 } catch (e) {
-                    console.log(`${n} 目录 ${f} 列取失败，跳过: ${i(e)}`);
+                    console.log(`${n} 目录 ${p} 列取失败，跳过: ${i(e)}`);
                     continue;
                 }
-                for (let e of d){
+                for (let e of f){
                     var c;
-                    if (s++, e.isDir) {
-                        o.set(e.fid, e.name), f === P && a.add(e.fid), t.push(e.fid);
+                    if (d++, e.isDir) {
+                        a.set(e.fid, e.name), o.push({
+                            fid: e.fid,
+                            name: e.name,
+                            depth: g + 1
+                        }), p === w && u.add(e.fid), t.push({
+                            fid: e.fid,
+                            depth: g + 1
+                        });
                         continue;
                     }
                     (1 === e.category || function(e) {
@@ -468,16 +478,19 @@ loadLibrary = (e)=>t(function*() {
                             Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
                         }), e;
                     }(r({}, e), {
-                        parentFid: f,
-                        parentName: null != (c = o.get(f)) ? c : '',
-                        parentInLibrary: a.has(f)
+                        parentFid: p,
+                        parentName: null != (c = a.get(p)) ? c : '',
+                        parentInLibrary: u.has(p)
                     }));
                 }
             }
-            return t.length > 0 && console.log(`${n} 扫描达到遍历上限（已走 ${u} 个目录、扫描 ${s} 项），结果可能不完整`), l;
+            return t.length > 0 && console.log(`${n} 扫描达到遍历上限（已走 ${s} 个目录、扫描 ${d} 项），结果可能不完整`), {
+                videos: l,
+                folders: o
+            };
         })(), A = new Map(), q = 0;
-        for (let e of W){
-            let t = null != (c = u(e.name)) ? c : u(e.parentName);
+        for (let e of P){
+            let t = null != (d = u(e.name)) ? d : u(e.parentName);
             if (!t) {
                 q++;
                 continue;
@@ -488,29 +501,29 @@ loadLibrary = (e)=>t(function*() {
         let T = [
             ...A.keys()
         ].sort();
-        console.log(`${n} 扫描到 ${W.length} 个视频，识别出 ${T.length} 部作品（${q} 个无番号跳过），模式=${'do' === w ? '整理' : '只报告'}`);
+        console.log(`${n} 扫描到 ${P.length} 个视频，识别出 ${T.length} 部作品（${q} 个无番号跳过），模式=${'do' === b ? '整理' : '只报告'}`);
         let D = 0, z = [];
         for (let r of T){
-            let a, u = A.get(r), c = r.toUpperCase().replace(/[^A-Z0-9]/g, ''), d = u.every((e)=>e.parentInLibrary && e.parentName && !e.parentName.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(c)), m = 1 === u.length, b = m ? null != (h = null == (k = /\.([A-Za-z0-9]{2,5})$/.exec(u[0].name)) ? void 0 : k[1]) ? h : 'mp4' : '', C = m ? `${r}.${b}` : '', j = !m || u[0].name === C, W = !!(d && j), q = yield S(r);
-            if (W) a = `已整理（文件夹「${u[0].parentName}」）`;
-            else if (q || D < 15) if (q || (D++, q = yield function(e, r) {
+            let a, u = A.get(r), d = r.toUpperCase().replace(/[^A-Z0-9]/g, ''), c = u.every((e)=>e.parentInLibrary && e.parentName && !e.parentName.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(d)), m = 1 === u.length, k = m ? null != (y = null == ($ = /\.([A-Za-z0-9]{2,5})$/.exec(u[0].name)) ? void 0 : $[1]) ? y : 'mp4' : '', C = m ? `${r}.${k}` : '', j = !m || u[0].name === C, P = !!(c && j), W = yield S(r);
+            if (P) a = `已整理（文件夹「${u[0].parentName}」）`;
+            else if (W || D < 15) if (W || (D++, W = yield function(e, r) {
                 return t(function*() {
                     let a = yield S(r);
                     if (a) return a;
                     let u = null;
                     try {
                         u = yield t(function*() {
-                            var t, n, i, a, u, c;
-                            let d = `${s}/search?${o({
+                            var t, n, i, a, u, d;
+                            let c = `${s}/search?${o({
                                 q: r,
                                 f: 'all'
-                            })}`, m = yield p(d), h = yield g(m, d);
-                            if (0 === h.length) return null;
-                            let $ = null != (t = h.find((e)=>e.code === r)) ? t : h[0], k = yield f(e), b = yield p($.link, k), C = yield Widget.html.load(b), _ = y(C), j = v(C, _), x = null != (n = C('img.video-cover').first().attr('src')) ? n : '';
+                            })}`, m = yield p(c), y = yield g(m, c);
+                            if (0 === y.length) return null;
+                            let $ = null != (t = y.find((e)=>e.code === r)) ? t : y[0], k = yield f(e), b = yield p($.link, k), C = yield Widget.html.load(b), _ = h(C), j = v(C, _), x = null != (n = C('img.video-cover').first().attr('src')) ? n : '';
                             x || (x = null != (i = C('meta[property="og:image"]').attr('content')) ? i : ''), x = l($.link, x) || $.cover;
                             let O = C('h2 strong.current-title').first().text().trim(), S = null != (a = C('meta[property="og:title"]').attr('content')) ? a : '';
                             return {
-                                actress: (null != (u = null == (c = j[0]) ? void 0 : c.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
+                                actress: (null != (u = null == (d = j[0]) ? void 0 : d.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
                                 cover: x,
                                 title: O || S || $.title,
                                 link: $.link
@@ -529,11 +542,11 @@ loadLibrary = (e)=>t(function*() {
                     } catch (e) {}
                     return u;
                 })();
-            }(e, r)), q && q.actress) if ('report' === w) a = `将归类到「${q.actress}」` + (m && !j ? `，文件改名为 ${C}` : '') + '（只报告，未执行）';
+            }(e, r)), W && W.actress) if ('report' === b) a = `将归类到「${W.actress}」` + (m && !j ? `，文件改名为 ${C}` : '') + '（只报告，未执行）';
             else {
                 let r = [];
                 try {
-                    let n = P ? yield x(e, P, q.actress) : '';
+                    let n = w ? yield x(e, w, W.actress) : '';
                     if (m && !j && (yield function(e, r, n) {
                         return t(function*() {
                             yield _(e, 'POST', '/file/rename', {}, {
@@ -554,7 +567,7 @@ loadLibrary = (e)=>t(function*() {
                                 });
                             })();
                         }(e, r.fid, n));
-                        r.push(`已归类到「${q.actress}」`);
+                        r.push(`已归类到「${W.actress}」`);
                     } else r.push('女优文件夹创建失败，未移动');
                 } catch (e) {
                     r.push(`整理失败：${i(e)}`);
@@ -563,32 +576,68 @@ loadLibrary = (e)=>t(function*() {
             }
             else a = '未查到女优（JavDB 无此番号或网络问题），暂未整理';
             else a = '待整理（本次查询额度已用完，下次打开继续）';
-            let T = [
-                `番号：${r}`,
-                ...(null == q ? void 0 : q.actress) ? [
-                    `女优：${q.actress}`
-                ] : [],
-                `状态：${a}`,
-                `文件：${u.map((e)=>e.name).join('、')}`
-            ];
             z.push({
-                id: r,
-                type: 'detail',
-                title: (null == q ? void 0 : q.title) ? `${r} ${q.title}` : r,
-                link: null != ($ = null == q ? void 0 : q.link) ? $ : `organizer:${r}`,
-                posterPath: (null == q ? void 0 : q.cover) || void 0,
-                coverUrl: (null == q ? void 0 : q.cover) || void 0,
-                backdropPath: (null == q ? void 0 : q.cover) || void 0,
-                description: T.join('\n'),
-                mediaType: 'movie'
+                code: r,
+                files: u,
+                info: W,
+                status: a
             });
         }
-        return console.log(`${n} 片库整理完成：${z.length} 部作品`), z;
+        let N = new Map();
+        if ('do' === b) {
+            for (let r of W.filter((e)=>e.fid !== w && u(e.name)).sort((e, t)=>t.depth - e.depth).slice(0, 60))try {
+                let n = yield j(e, r.fid);
+                0 === n.length && (yield function(e, r) {
+                    return t(function*() {
+                        yield _(e, 'POST', '/file/delete', {}, {
+                            action_type: 1,
+                            exclude_fids: [],
+                            filelist: [
+                                r
+                            ]
+                        });
+                    })();
+                }(e, r.fid), N.set(r.fid, r.name));
+            } catch (e) {
+                console.log(`${n} 空文件夹清理跳过「${r.name}」: ${i(e)}`);
+            }
+            N.size > 0 && console.log(`${n} 已清理空番号文件夹 ${N.size} 个：${[
+                ...N.values()
+            ].join('、')}`);
+        }
+        let E = z.map(({ code: e, files: t, info: r, status: n })=>{
+            var i;
+            let l = n, o = t.map((e)=>{
+                var t;
+                return null != (t = e.parentFid) ? t : '';
+            }).filter((e, t, r)=>e && N.has(e) && r.indexOf(e) === t).map((e)=>N.get(e));
+            o.length > 0 && (l += `；已清理空文件夹「${o.join('」、「')}」`);
+            let a = [
+                `番号：${e}`,
+                ...(null == r ? void 0 : r.actress) ? [
+                    `女优：${r.actress}`
+                ] : [],
+                `状态：${l}`,
+                `文件：${t.map((e)=>e.name).join('、')}`
+            ];
+            return {
+                id: e,
+                type: 'detail',
+                title: (null == r ? void 0 : r.title) ? `${e} ${r.title}` : e,
+                link: null != (i = null == r ? void 0 : r.link) ? i : `organizer:${e}`,
+                posterPath: (null == r ? void 0 : r.cover) || void 0,
+                coverUrl: (null == r ? void 0 : r.cover) || void 0,
+                backdropPath: (null == r ? void 0 : r.cover) || void 0,
+                description: a.join('\n'),
+                mediaType: 'movie'
+            };
+        });
+        return console.log(`${n} 片库整理完成：${E.length} 部作品`), E;
     })(), loadDetail = (e, r)=>t(function*() {
-        var t, c, m, $, k;
+        var t, d, m, $, k;
         let b;
         if (!e) return null;
-        yield d(r);
+        yield c(r);
         let C = e, _ = null;
         if (e.startsWith('organizer:')) {
             if (!(_ = a(e.slice(10)))) return null;
@@ -610,13 +659,13 @@ loadLibrary = (e)=>t(function*() {
             return console.log(`${n} 详情获取失败: ${i(e)}`), null;
         }
         try {
-            let e = yield Widget.html.load(b), t = y(e), r = _, n = h(t, [
+            let e = yield Widget.html.load(b), t = h(e), r = _, n = y(t, [
                 '番號',
                 '番号'
             ]);
-            n && (r = null != (c = a(n.valueText)) ? c : r), r || (r = u(e('title').first().text()));
-            let i = e('h2 strong.current-title').first().text().trim(), o = null != (m = e('meta[property="og:title"]').attr('content')) ? m : '', s = i || o || r || C, d = null != ($ = e('img.video-cover').first().attr('src')) ? $ : '';
-            d || (d = null != (k = e('meta[property="og:image"]').attr('content')) ? k : ''), d = l(C, d);
+            n && (r = null != (d = a(n.valueText)) ? d : r), r || (r = u(e('title').first().text()));
+            let i = e('h2 strong.current-title').first().text().trim(), o = null != (m = e('meta[property="og:title"]').attr('content')) ? m : '', s = i || o || r || C, c = null != ($ = e('img.video-cover').first().attr('src')) ? $ : '';
+            c || (c = null != (k = e('meta[property="og:image"]').attr('content')) ? k : ''), c = l(C, c);
             let f = v(e, t).map((e)=>({
                     id: e.href || e.name,
                     title: e.name,
@@ -627,10 +676,10 @@ loadLibrary = (e)=>t(function*() {
                 type: 'detail',
                 title: s,
                 link: C,
-                posterPath: d || void 0,
-                detailPoster: d || void 0,
-                coverUrl: d || void 0,
-                backdropPath: d || void 0,
+                posterPath: c || void 0,
+                detailPoster: c || void 0,
+                coverUrl: c || void 0,
+                backdropPath: c || void 0,
                 peoples: f.length > 0 ? f : void 0,
                 description: p.join('\n'),
                 mediaType: 'movie'
