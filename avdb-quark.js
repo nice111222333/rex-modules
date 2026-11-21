@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: "JavDB 浏览（最新/Top250/热播与分类榜单/搜索/详情）+ 夸克网盘播放：先按番号搜自己的网盘，未命中时自动搜分享索引并转存到网盘再播，另有 MemoJav / Jable 外部源兜底。使用前请在全局参数中填写自己的夸克网盘 Cookie；如需 JavDB 磁力，请填「JavDB Cookie」（从已登录的浏览器复制）。JavDB 本站对部分地区 IP 有限制，若列表为空请检查代理节点地区（建议非日本节点）。",
     author: 'v7777',
     site: 'https://javdb.com',
-    version: "0.3.4",
+    version: "0.3.5",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -247,13 +247,13 @@ function f(...e) {
     }
     return null;
 }
-let p = 'https://javdb.com', g = 'javdb_cookie_mirror';
-function h(e) {
+let p = 'https://javdb.com', h = 'javdb_cookie_mirror';
+function g(e) {
     return t(function*() {
         try {
             if (!e || 'string' != typeof e.javdbCookie) return;
             let t = e.javdbCookie.trim();
-            t ? yield Widget.storage.set(g, t) : yield Widget.storage.remove(g);
+            t ? yield Widget.storage.set(h, t) : yield Widget.storage.remove(h);
         } catch (e) {}
     })();
 }
@@ -261,7 +261,7 @@ function m(e) {
     return t(function*() {
         if (e && 'string' == typeof e.javdbCookie && e.javdbCookie.trim()) return e.javdbCookie.trim();
         try {
-            let e = yield Widget.storage.get(g);
+            let e = yield Widget.storage.get(h);
             if ('string' == typeof e && e.trim()) return e.trim();
         } catch (e) {}
         return '';
@@ -294,17 +294,17 @@ function k(e, l) {
         let n = [], i = new Set();
         return r.each((e, r)=>{
             var a, u, s, c, p;
-            let g = t(r), h = o(l, null != (a = g.attr('href')) ? a : '');
-            if (!h || i.has(h)) return;
-            i.add(h);
-            let m = g.find('.video-title strong').first().text().trim(), v = (null != (u = g.attr('title')) ? u : '').trim(), y = g.find('.video-title').first().text().trim(), $ = null != (s = d(m)) ? s : f(v, y), k = v || y || $ || h, b = null != (c = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? c : '';
+            let h = t(r), g = o(l, null != (a = h.attr('href')) ? a : '');
+            if (!g || i.has(g)) return;
+            i.add(g);
+            let m = h.find('.video-title strong').first().text().trim(), v = (null != (u = h.attr('title')) ? u : '').trim(), y = h.find('.video-title').first().text().trim(), $ = null != (s = d(m)) ? s : f(v, y), k = v || y || $ || g, b = null != (c = null != (p = h.find('img').first().attr('src')) ? p : h.find('img').first().attr('data-src')) ? c : '';
             b = o(l, b);
-            let x = g.find('.score').first().text(), _ = /(\d+(?:\.\d+)?)\s*分/.exec(x), C = g.find('.meta').first().text().trim(), w = /(\d{4}-\d{2}-\d{2})/.exec(C);
+            let x = h.find('.score').first().text(), _ = /(\d+(?:\.\d+)?)\s*分/.exec(x), C = h.find('.meta').first().text().trim(), w = /(\d{4}-\d{2}-\d{2})/.exec(C);
             n.push({
-                id: null != $ ? $ : h,
+                id: null != $ ? $ : g,
                 type: 'detail',
                 title: k,
-                link: h,
+                link: g,
                 posterPath: b || void 0,
                 coverUrl: b || void 0,
                 backdropPath: b || void 0,
@@ -347,7 +347,7 @@ function _(e) {
 }
 function C(e, l, r) {
     return t(function*() {
-        yield h(e);
+        yield g(e);
         let t = _(e.period);
         return x(`${p}/rankings/movies?${a({
             p: t,
@@ -362,16 +362,16 @@ function D(e, t) {
     return e.find((e)=>t.includes(e.label));
 }
 loadHome = (e)=>t(function*() {
-        yield h(e);
+        yield g(e);
         let t = e.genreId || e.peopleId || '';
         return t ? x(o(p, t), '分类/演员列表') : x(`${p}/`, '首页最新');
     })(), loadTop250 = (e)=>t(function*() {
         var t;
-        yield h(e);
+        yield g(e);
         let r = (null != (t = e.ranking_type) ? t : '').trim();
         return r && 'all' !== r && console.log(`${l} Top250 ranking_type=${r}：年份筛选形式无公开出处，按全部年份处理`), x(`${p}/rankings/top`, 'Top250');
     })(), loadPlayback = (e)=>t(function*() {
-        yield h(e);
+        yield g(e);
         let t = _(e.period);
         if ('monthly' !== t) return x(`${p}/rankings/playback`, `热播榜(${t})`);
         let r = yield x(`${p}/rankings/playback?p=monthly`, '热播榜(monthly)');
@@ -383,7 +383,7 @@ loadHome = (e)=>t(function*() {
     })(), loadWestern = (e)=>t(function*() {
         return C(e, 'western', '欧美榜');
     })(), loadFC2 = (e)=>t(function*() {
-        yield h(e);
+        yield g(e);
         let t = _(e.period);
         return x(`${p}/rankings/movies?${a({
             p: t,
@@ -391,7 +391,7 @@ loadHome = (e)=>t(function*() {
         })}`, `FC2榜(${t})`);
     })(), searchVideos = (e)=>t(function*() {
         var t, r, n;
-        yield h(e);
+        yield g(e);
         let i = (null != (t = null != (r = null != (n = e.keyword) ? n : e.title) ? r : e.query) ? t : '').trim();
         return i ? x(`${p}/search?${a({
             q: i,
@@ -400,7 +400,7 @@ loadHome = (e)=>t(function*() {
     })(), loadDetail = (e, r)=>t(function*() {
         let t;
         if (!e) return null;
-        yield h(r);
+        yield g(r);
         let n = yield m(r);
         try {
             t = yield $(e, n);
@@ -408,8 +408,8 @@ loadHome = (e)=>t(function*() {
             return console.log(`${l} JavDB 详情获取失败: ${i(e)}`), null;
         }
         try {
-            var a, u, s, c, p, g, v, y, k;
-            let r, i, h, m = yield Widget.html.load(t), $ = function(e) {
+            var a, u, s, c, p, h, v, y, k;
+            let r, i, g, m = yield Widget.html.load(t), $ = function(e) {
                 let t = e('nav.panel.movie-panel-info').first(), l = [];
                 if (0 === t.length) return l;
                 let r = t.find('> div, .panel-block'), n = new Set();
@@ -452,14 +452,14 @@ loadHome = (e)=>t(function*() {
             let P = m('.score-stars').first();
             if (P.length > 0) {
                 let e = (P.parent().text() || '').replace(/\s+/g, ' ');
-                h = null == (y = /(\d+(?:\.\d+)?)\s*分/.exec(e)) ? void 0 : y[1];
+                g = null == (y = /(\d+(?:\.\d+)?)\s*分/.exec(e)) ? void 0 : y[1];
             }
-            if (!h) {
+            if (!g) {
                 let e = D($, [
                     '評分',
                     '评分'
                 ]);
-                e && (h = null == (k = /(\d+(?:\.\d+)?)/.exec(e.valueText)) ? void 0 : k[1]);
+                e && (g = null == (k = /(\d+(?:\.\d+)?)/.exec(e.valueText)) ? void 0 : k[1]);
             }
             let B = [], I = D($, [
                 '類別',
@@ -557,10 +557,10 @@ loadHome = (e)=>t(function*() {
                 posterPath: q || void 0,
                 detailPoster: q || void 0,
                 coverUrl: q || void 0,
-                backdropPath: null != (p = null != (g = E[0]) ? g : q) ? p : void 0,
+                backdropPath: null != (p = null != (h = E[0]) ? h : q) ? p : void 0,
                 backdropPaths: E.length > 0 ? E : void 0,
                 releaseDate: j,
-                rating: h,
+                rating: g,
                 duration: r,
                 durationText: i,
                 genreTitle: B.map((e)=>e.title).join(' · ') || void 0,
@@ -622,7 +622,7 @@ function I(e, l, r, n, i, o, u) {
             return l;
         })();
         if (!p) throw Error('未填写夸克网盘 Cookie（模块全局参数 quarkCookie）');
-        let g = a(function(e) {
+        let h = a(function(e) {
             for(var t = 1; t < arguments.length; t++){
                 var l = null != arguments[t] ? arguments[t] : {}, r = Object.keys(l);
                 "function" == typeof Object.getOwnPropertySymbols && (r = r.concat(Object.getOwnPropertySymbols(l).filter(function(e) {
@@ -641,15 +641,15 @@ function I(e, l, r, n, i, o, u) {
         }({
             pr: 'ucpro',
             fr: 'pc'
-        }, i)), h = `${l}${n}?${g}`, m = {
+        }, i)), g = `${l}${n}?${h}`, m = {
             Cookie: p,
             Accept: 'application/json, text/plain, */*',
             Referer: null != u ? u : T,
             'User-Agent': q
         };
-        f = 'GET' === r ? yield Widget.http.get(h, {
+        f = 'GET' === r ? yield Widget.http.get(g, {
             headers: m
-        }) : yield Widget.http.post(h, null != o ? o : {}, {
+        }) : yield Widget.http.post(g, null != o ? o : {}, {
             headers: m
         }), yield (d = null == f ? void 0 : f.headers, t(function*() {
             try {
@@ -736,18 +736,40 @@ let E = {
 };
 function N(e, r) {
     return t(function*() {
-        var t, n, o, a;
-        let u = [];
+        var n, o, a;
+        let u = [], s = '', d = (l)=>t(function*() {
+                var t;
+                let n = {
+                    fid: r.fid,
+                    resolutions: 'low,normal,high,super,2k,4k'
+                };
+                l && (n.supports = 'fmp4_av,m3u8,dolby_vision');
+                let { json: i } = yield W(e, 'POST', '/file/v2/play/project', {}, n);
+                return Array.isArray(null == i || null == (t = i.data) ? void 0 : t.video_list) ? i.data.video_list : [];
+            })();
         try {
-            let { json: l } = yield W(e, 'POST', '/file/v2/play/project', {}, {
-                fid: r.fid,
-                resolutions: 'low,normal,high,super,2k,4k',
-                supports: 'fmp4_av,m3u8,dolby_vision'
-            });
-            for (let e of (Array.isArray(null == l || null == (t = l.data) ? void 0 : t.video_list) ? l.data.video_list : []).filter((e)=>{
+            let e = [], t = null;
+            try {
+                e = yield d(!0);
+            } catch (e) {
+                t = e;
+            }
+            let l = e.filter((e)=>{
                 var t;
                 return null == e || null == (t = e.video_info) ? void 0 : t.url;
-            }).sort((e, t)=>{
+            });
+            if (0 === l.length) {
+                let r = e.length;
+                try {
+                    l = (e = yield d(!1)).filter((e)=>{
+                        var t;
+                        return null == e || null == (t = e.video_info) ? void 0 : t.url;
+                    }), 0 === l.length && (s = r + e.length === 0 ? '转码未生成（列表为空）' : `转码生成中（${Math.max(r, e.length)}条无链接）`);
+                } catch (e) {
+                    s = `转码接口出错：${i(null != t ? t : e)}`;
+                }
+            }
+            for (let e of l.sort((e, t)=>{
                 var l, r, n, i;
                 return (null != (l = E[String(null != (r = null == t ? void 0 : t.resolution) ? r : '').toLowerCase()]) ? l : 0) - (null != (n = E[String(null != (i = null == e ? void 0 : e.resolution) ? i : '').toLowerCase()]) ? n : 0);
             }).slice(0, 3))u.push({
@@ -755,8 +777,9 @@ function N(e, r) {
                 description: r.name,
                 url: String(e.video_info.url)
             });
+            0 !== u.length || s || (s = '转码未生成（列表为空）');
         } catch (e) {
-            console.log(`${l} 夸克转码获取失败（${r.name}），仅尝试原画: ${i(e)}`);
+            console.log(`${l} 夸克转码获取失败（${r.name}），仅尝试原画: ${i(e)}`), s = `转码接口出错：${i(e)}`;
         }
         try {
             let { json: t, cookieSent: l } = yield W(e, 'POST', '/file/download', {}, {
@@ -772,7 +795,8 @@ function N(e, r) {
                         if (!e) return '';
                         let t = e / 1073741824;
                         return t >= 1 ? `${t.toFixed(2)} GB` : `${(e / 1048576).toFixed(1)} MB`;
-                    }(r.size)
+                    }(r.size),
+                    s
                 ].filter(Boolean).join(' · '),
                 url: String(n),
                 customHeaders: {
@@ -820,9 +844,9 @@ function M(e, l, r, n) {
 }
 let V = 'https://jable.tv', F = 'https://memojav.org';
 loadResource = (e)=>t(function*() {
-        var d, p, g, m, y, $;
+        var d, p, h, m, y, $;
         let k, b;
-        console.log(`${l} loadResource 被调用（id=${null != (d = e.id) ? d : ''}，title=${null != (p = e.title) ? p : ''}，link=${null != (g = e.link) ? g : ''}）`);
+        console.log(`${l} loadResource 被调用（id=${null != (d = e.id) ? d : ''}，title=${null != (p = e.title) ? p : ''}，link=${null != (h = e.link) ? h : ''}）`);
         let x = {
             quark: '',
             share: '',
@@ -836,7 +860,7 @@ loadResource = (e)=>t(function*() {
                 url: null != ($ = e.link) ? $ : 'https://javdb.com'
             }
         ];
-        yield h(e);
+        yield g(e);
         let C = 'external-first' === e.sourcePriority, w = [], D = [], q = ()=>t(function*() {
                 var o;
                 try {
@@ -906,10 +930,10 @@ loadResource = (e)=>t(function*() {
                                     }
                                 }), p = 'number' == typeof (null == f ? void 0 : f.statusCode) ? f.statusCode : 200;
                                 if (p >= 400) throw Error(`HTTP ${p}: 分享索引 ${u}`);
-                                let g = s(null == f ? void 0 : f.data);
-                                if (!g) throw Error(`分享索引 ${u} 返回了无法解析的内容`);
-                                if ('number' == typeof g.code && 0 !== g.code) throw Error(`分享索引出错: ${null != (i = g.message) ? i : `code=${g.code}`}`);
-                                let h = null != (l = g.data) ? l : g, m = c(_), v = new Map(), y = (e, t, l)=>{
+                                let h = s(null == f ? void 0 : f.data);
+                                if (!h) throw Error(`分享索引 ${u} 返回了无法解析的内容`);
+                                if ('number' == typeof h.code && 0 !== h.code) throw Error(`分享索引出错: ${null != (i = h.message) ? i : `code=${h.code}`}`);
+                                let g = null != (l = h.data) ? l : h, m = c(_), v = new Map(), y = (e, t, l)=>{
                                     if (v.size >= 12) return;
                                     let r = String(null != e ? e : '');
                                     if (!r.includes('quark')) return;
@@ -933,9 +957,9 @@ loadResource = (e)=>t(function*() {
                                         title: i,
                                         tier: o
                                     });
-                                }, $ = null == h || null == (n = h.merged_by_type) ? void 0 : n.quark;
+                                }, $ = null == g || null == (n = g.merged_by_type) ? void 0 : n.quark;
                                 if (Array.isArray($)) for (let e of $)y(null == e ? void 0 : e.url, null == e ? void 0 : e.password, null != (o = null == e ? void 0 : e.note) ? o : '');
-                                let k = null == h ? void 0 : h.results;
+                                let k = null == g ? void 0 : g.results;
                                 if (Array.isArray(k)) {
                                     let e = 0;
                                     for (let t of k){
@@ -1044,15 +1068,15 @@ loadResource = (e)=>t(function*() {
                                             to_pdir_fid: u
                                         }), p = null != (t = null == f ? void 0 : f.data) ? t : {};
                                         if (!0 === p.task_sync) return 'done';
-                                        let g = p.task_id ? String(p.task_id) : '';
-                                        if (!g) return 'done';
-                                        let h = Date.now();
-                                        for(let t = 1; t <= 20 && !(Date.now() - h > 55000); t++){
+                                        let h = p.task_id ? String(p.task_id) : '';
+                                        if (!h) return 'done';
+                                        let g = Date.now();
+                                        for(let t = 1; t <= 20 && !(Date.now() - g > 55000); t++){
                                             let r = 3000;
                                             try {
                                                 let { json: l } = yield I(e, A, 'GET', '/task', {
                                                     uc_param_str: '',
-                                                    task_id: g,
+                                                    task_id: h,
                                                     retry_index: String(t)
                                                 }), n = null == l || null == (s = l.data) ? void 0 : s.status;
                                                 if (2 === n) return 'done';
@@ -1157,10 +1181,10 @@ loadResource = (e)=>t(function*() {
                             Referer: `${V}/`
                         });
                         if (v(p)) return console.log(`${l} Jable 搜索被 Cloudflare 验证页拦截`), [];
-                        let g = new Set(), h = /href\s*=\s*["']((?:https:\/\/jable\.tv)?\/videos\/[\w-]+\/?)["']/gi;
-                        for(; null !== (s = h.exec(p));)g.add(o(V, s[1]));
+                        let h = new Set(), g = /href\s*=\s*["']((?:https:\/\/jable\.tv)?\/videos\/[\w-]+\/?)["']/gi;
+                        for(; null !== (s = g.exec(p));)h.add(o(V, s[1]));
                         let m = [
-                            ...g
+                            ...h
                         ], y = null != (e = null != (t = m.find((e)=>e.toLowerCase().includes(d))) ? t : m.find((e)=>e.toLowerCase().replace(/-/g, '').includes(c))) ? e : m[0];
                         if (!y) return console.log(`${l} Jable 未找到 ${_} 的视频页`), [];
                         let $ = yield u(y, {
