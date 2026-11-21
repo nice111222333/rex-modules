@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: '你的夸克网盘片库（经 AList WebDAV 播放）：按番号列出网盘「艺术」里的作品，封面和信息取自 JavDB，播放走 AList WebDAV（流畅）。需先把夸克挂载到 AList，并在全局参数中填写 AList 地址、令牌和账号密码。把「我的片库」添加到首页即可当片库分区用。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.3",
+    version: "0.1.4",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
