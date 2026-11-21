@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: '你的夸克网盘片库（经 AList WebDAV 播放）：按番号列出网盘「艺术」里的作品，封面和信息取自 JavDB，播放走 AList WebDAV（流畅）。需先把夸克挂载到 AList，并在全局参数中填写 AList 地址、令牌和账号密码。把「我的片库」添加到首页即可当片库分区用。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.2",
+    version: "0.1.3",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -133,7 +133,7 @@ function l(e) {
     return Object.keys(e).map((t)=>`${encodeURIComponent(t)}=${encodeURIComponent(e[t])}`).join('&');
 }
 function o(e) {
-    return e.length > 3 ? e.replace(/^0+(?=\d)/, '') : e;
+    return e.length > 4 ? e.replace(/^0+(?=\d)/, '') : e;
 }
 function u(e) {
     var t;
@@ -144,10 +144,17 @@ function u(e) {
     if (r) return `${r[1]}${r[2]}${r[3]}`;
     let l = /(?:^|[^A-Z])([A-Z]{2,6})-S(\d{1,3})(?![0-9])/.exec(i);
     if (l) return `${l[1]}-S${l[2]}`;
-    let u = /(?:^|[^A-Z])([A-Z]{2,6})-(\d{2,6})(?![0-9])/.exec(i);
+    let u = /(?:^|[^A-Z])([A-Z]{2,6})-\s*(\d{2,6})(?![0-9])/.exec(i);
     if (u) return `${u[1]}-${o(u[2])}`;
     let a = /(?:^|[^A-Z0-9])([A-Z]{2,6})(\d{3,6})(?![0-9])/.exec(i);
-    return a ? `${a[1]}-${o(a[2])}` : null;
+    if (a) return `${a[1]}-${o(a[2])}`;
+    for (let e of i.matchAll(/(?:^|[^A-Z])([A-Z]{2,6})\s+(\d{3,5})(?![0-9])/g))if (![
+        '720',
+        '1080',
+        '1440',
+        '2160'
+    ].includes(e[2])) return `${e[1]}-${o(e[2])}`;
+    return null;
 }
 function a(e) {
     return e.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -213,10 +220,10 @@ function m(e, i) {
             let h = t(n), g = r(i, null != (a = h.attr('href')) ? a : '');
             if (!g || o.has(g)) return;
             o.add(g);
-            let m = h.find('.video-title strong').first().text().trim(), v = (null != (d = h.attr('title')) ? d : '').trim(), y = h.find('.video-title').first().text().trim(), $ = null != (c = u(m)) ? c : s(v, y), A = null != (f = null != (p = h.find('img').first().attr('src')) ? p : h.find('img').first().attr('data-src')) ? f : '';
+            let m = h.find('.video-title strong').first().text().trim(), v = (null != (d = h.attr('title')) ? d : '').trim(), $ = h.find('.video-title').first().text().trim(), y = null != (c = u(m)) ? c : s(v, $), A = null != (f = null != (p = h.find('img').first().attr('src')) ? p : h.find('img').first().attr('data-src')) ? f : '';
             A = r(i, A), l.push({
-                code: $,
-                title: v || y || $ || g,
+                code: y,
+                title: v || $ || y || g,
                 link: g,
                 cover: A
             });
@@ -226,7 +233,7 @@ function m(e, i) {
 function v(e) {
     return e.replace(/[:：\s]/g, '');
 }
-function y(e) {
+function $(e) {
     let t = e('nav.panel.movie-panel-info').first(), i = [];
     if (0 === t.length) return i;
     let n = t.find('> div, .panel-block'), r = new Set();
@@ -245,11 +252,11 @@ function y(e) {
         });
     }), i;
 }
-function $(e, t) {
+function y(e, t) {
     return e.find((e)=>t.includes(e.label));
 }
 function A(e, t) {
-    let i = $(t, [
+    let i = y(t, [
         '演員',
         '演员'
     ]);
@@ -474,7 +481,7 @@ loadLibrary = (e)=>t(function*() {
                                 f: 'all'
                             })}`, f = yield g(d), p = yield m(f, d);
                             if (0 === p.length) return null;
-                            let v = null != (t = p.find((e)=>e.code === o)) ? t : p[0], $ = yield h(e), b = yield g(v.link, $), C = yield Widget.html.load(b), k = y(C), x = A(C, k), L = null != (i = C('img.video-cover').first().attr('src')) ? i : '';
+                            let v = null != (t = p.find((e)=>e.code === o)) ? t : p[0], y = yield h(e), b = yield g(v.link, y), C = yield Widget.html.load(b), k = $(C), x = A(C, k), L = null != (i = C('img.video-cover').first().attr('src')) ? i : '';
                             L || (L = null != (n = C('meta[property="og:image"]').attr('content')) ? n : ''), L = r(v.link, L) || v.cover;
                             let S = C('h2 strong.current-title').first().text().trim(), w = null != (u = C('meta[property="og:title"]').attr('content')) ? u : '';
                             return {
@@ -569,7 +576,7 @@ loadLibrary = (e)=>t(function*() {
             return console.log(`${i} 详情获取失败: ${n(e)}`), null;
         }
         try {
-            let t = yield Widget.html.load(b), i = y(t), n = x, l = $(i, [
+            let t = yield Widget.html.load(b), i = $(t), n = x, l = y(i, [
                 '番號',
                 '番号'
             ]);
