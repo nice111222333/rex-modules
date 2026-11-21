@@ -45,7 +45,7 @@ WidgetMetadata = {
     description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹，整理后自动删除空的番号文件夹。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.3",
+    version: "0.1.4",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -124,11 +124,14 @@ function o(e) {
     return Object.keys(e).map((t)=>`${encodeURIComponent(t)}=${encodeURIComponent(e[t])}`).join('&');
 }
 function a(e) {
+    var t;
     if (!e) return null;
-    let t = String(e).toUpperCase().replace(/[^A-Z0-9-]/g, ''), r = /FC2(?:-PPV)?-?(\d{5,7})/.exec(t);
-    if (r) return `FC2-PPV-${r[1]}`;
-    let n = /([A-Z]{2,6})-?(\d{2,5})/.exec(t);
-    return n ? `${n[1]}-${n[2]}` : null;
+    let r = String(e).toUpperCase(), n = null != (t = /(?:^|[^A-Z0-9])FC2[- ]?PPV[- ]?(\d{5,7})(?![0-9])/.exec(r)) ? t : /(?:^|[^A-Z0-9])FC2[- ]?(\d{5,7})(?![0-9])/.exec(r);
+    if (n) return `FC2-PPV-${n[1]}`;
+    let i = /(?:^|[^A-Z])([A-Z]{2,6})-(\d{2,6})(?![0-9])/.exec(r);
+    if (i) return `${i[1]}-${i[2]}`;
+    let l = /(?:^|[^A-Z0-9])([A-Z]{2,6})(\d{3,6})(?![0-9])/.exec(r);
+    return l ? `${l[1]}-${l[2]}` : null;
 }
 function u(...e) {
     for (let t of e){
@@ -353,7 +356,7 @@ function _(e, n, i, l, a) {
         return h;
     })();
 }
-function j(e, r) {
+function x(e, r) {
     return t(function*() {
         let t = [], n = 1;
         for(; n <= 20; n++){
@@ -379,9 +382,9 @@ function j(e, r) {
         return t;
     })();
 }
-function x(e, r, l) {
+function j(e, r, l) {
     return t(function*() {
-        let t = (yield j(e, r)).find((e)=>e.isDir && e.name === l);
+        let t = (yield x(e, r)).find((e)=>e.isDir && e.name === l);
         if (t) return t.fid;
         try {
             yield _(e, 'POST', '/file', {}, {
@@ -395,7 +398,7 @@ function x(e, r, l) {
         }
         for(let t = 0; t < 3; t++){
             var o, a;
-            let t = null != (o = null == (a = (yield j(e, r)).find((e)=>e.isDir && e.name === l)) ? void 0 : a.fid) ? o : '';
+            let t = null != (o = null == (a = (yield x(e, r)).find((e)=>e.isDir && e.name === l)) ? void 0 : a.fid) ? o : '';
             if (t) return t;
             yield new Promise((e)=>{
                 'function' == typeof setTimeout ? setTimeout(e, 800) : e();
@@ -425,16 +428,53 @@ function S(e) {
         return null;
     })();
 }
+function P(e, r) {
+    return t(function*() {
+        let a = yield S(r);
+        if (a) return a;
+        let u = null;
+        try {
+            u = yield t(function*() {
+                var t, n, i, a, u, d;
+                let c = `${s}/search?${o({
+                    q: r,
+                    f: 'all'
+                })}`, m = yield p(c), y = yield g(m, c);
+                if (0 === y.length) return null;
+                let $ = null != (t = y.find((e)=>e.code === r)) ? t : y[0], k = yield f(e), b = yield p($.link, k), C = yield Widget.html.load(b), _ = h(C), x = v(C, _), j = null != (n = C('img.video-cover').first().attr('src')) ? n : '';
+                j || (j = null != (i = C('meta[property="og:image"]').attr('content')) ? i : ''), j = l($.link, j) || $.cover;
+                let O = C('h2 strong.current-title').first().text().trim(), S = null != (a = C('meta[property="og:title"]').attr('content')) ? a : '';
+                return {
+                    actress: (null != (u = null == (d = x[0]) ? void 0 : d.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
+                    cover: j,
+                    title: O || S || $.title,
+                    link: $.link
+                };
+            })();
+        } catch (e) {
+            console.log(`${n} JavDB 查询 ${r} 失败: ${i(e)}`);
+        }
+        if (u) try {
+            yield Widget.storage.set(O + r.toUpperCase(), JSON.stringify({
+                a: u.actress,
+                c: u.cover,
+                t: u.title,
+                l: u.link
+            }));
+        } catch (e) {}
+        return u;
+    })();
+}
 loadLibrary = (e)=>t(function*() {
-        var a, d, m, y, $, k;
+        var l, o, a, s, d, f;
         yield c(e);
-        let b = (null != (a = e.organizeMode) ? a : 'do') === 'report' ? 'report' : 'do', w = yield (k = 'do' === b, t(function*() {
+        let p = (null != (l = e.organizeMode) ? l : 'do') === 'report' ? 'report' : 'do', g = yield (f = 'do' === p, t(function*() {
             var t;
             let r = (null != (t = e.libraryRoot) ? t : '').trim();
             if ('/' === r) return '0';
-            let n = '' === r ? '艺术' : r, i = (yield j(e, '0')).find((e)=>e.isDir && e.name === n);
-            return i ? i.fid : k ? x(e, '0', n) : '';
-        })()), { videos: P, folders: W } = yield t(function*() {
+            let n = '' === r ? '艺术' : r, i = (yield x(e, '0')).find((e)=>e.isDir && e.name === n);
+            return i ? i.fid : f ? j(e, '0', n) : '';
+        })()), { videos: m, folders: h } = yield t(function*() {
             let t = [
                 {
                     fid: '0',
@@ -442,10 +482,10 @@ loadLibrary = (e)=>t(function*() {
                 }
             ], l = [], o = [], a = new Map(), u = new Set(), s = 0, d = 0;
             for(; t.length > 0 && s < 120 && d < 8000;){
-                let f, { fid: p, depth: g } = t.shift();
+                let f, { fid: p, depth: m } = t.shift();
                 s++;
                 try {
-                    f = yield j(e, p);
+                    f = yield x(e, p);
                 } catch (e) {
                     console.log(`${n} 目录 ${p} 列取失败，跳过: ${i(e)}`);
                     continue;
@@ -456,10 +496,10 @@ loadLibrary = (e)=>t(function*() {
                         a.set(e.fid, e.name), o.push({
                             fid: e.fid,
                             name: e.name,
-                            depth: g + 1
-                        }), p === w && u.add(e.fid), t.push({
+                            depth: m + 1
+                        }), p === g && u.add(e.fid), t.push({
                             fid: e.fid,
-                            depth: g + 1
+                            depth: m + 1
                         });
                         continue;
                     }
@@ -488,74 +528,38 @@ loadLibrary = (e)=>t(function*() {
                 videos: l,
                 folders: o
             };
-        })(), A = new Map(), q = 0;
-        for (let e of P){
-            let t = null != (d = u(e.name)) ? d : u(e.parentName);
+        })(), y = new Map(), v = 0;
+        for (let e of m){
+            let t = null != (o = u(e.name)) ? o : u(e.parentName);
             if (!t) {
-                q++;
+                v++;
                 continue;
             }
-            let r = null != (m = A.get(t)) ? m : [];
-            r.push(e), A.set(t, r);
+            let r = null != (a = y.get(t)) ? a : [];
+            r.push(e), y.set(t, r);
         }
-        let T = [
-            ...A.keys()
+        let $ = [
+            ...y.keys()
         ].sort();
-        console.log(`${n} 扫描到 ${P.length} 个视频，识别出 ${T.length} 部作品（${q} 个无番号跳过），模式=${'do' === b ? '整理' : '只报告'}`);
-        let D = 0, z = [];
-        for (let r of T){
-            let a, u = A.get(r), d = r.toUpperCase().replace(/[^A-Z0-9]/g, ''), c = u.every((e)=>e.parentInLibrary && e.parentName && !e.parentName.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(d)), m = 1 === u.length, k = m ? null != (y = null == ($ = /\.([A-Za-z0-9]{2,5})$/.exec(u[0].name)) ? void 0 : $[1]) ? y : 'mp4' : '', C = m ? `${r}.${k}` : '', j = !m || u[0].name === C, P = !!(c && j), W = yield S(r);
-            if (P) a = `已整理（文件夹「${u[0].parentName}」）`;
-            else if (W || D < 15) if (W || (D++, W = yield function(e, r) {
-                return t(function*() {
-                    let a = yield S(r);
-                    if (a) return a;
-                    let u = null;
-                    try {
-                        u = yield t(function*() {
-                            var t, n, i, a, u, d;
-                            let c = `${s}/search?${o({
-                                q: r,
-                                f: 'all'
-                            })}`, m = yield p(c), y = yield g(m, c);
-                            if (0 === y.length) return null;
-                            let $ = null != (t = y.find((e)=>e.code === r)) ? t : y[0], k = yield f(e), b = yield p($.link, k), C = yield Widget.html.load(b), _ = h(C), j = v(C, _), x = null != (n = C('img.video-cover').first().attr('src')) ? n : '';
-                            x || (x = null != (i = C('meta[property="og:image"]').attr('content')) ? i : ''), x = l($.link, x) || $.cover;
-                            let O = C('h2 strong.current-title').first().text().trim(), S = null != (a = C('meta[property="og:title"]').attr('content')) ? a : '';
-                            return {
-                                actress: (null != (u = null == (d = j[0]) ? void 0 : d.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
-                                cover: x,
-                                title: O || S || $.title,
-                                link: $.link
-                            };
-                        })();
-                    } catch (e) {
-                        console.log(`${n} JavDB 查询 ${r} 失败: ${i(e)}`);
-                    }
-                    if (u) try {
-                        yield Widget.storage.set(O + r.toUpperCase(), JSON.stringify({
-                            a: u.actress,
-                            c: u.cover,
-                            t: u.title,
-                            l: u.link
-                        }));
-                    } catch (e) {}
-                    return u;
-                })();
-            }(e, r)), W && W.actress) if ('report' === b) a = `将归类到「${W.actress}」` + (m && !j ? `，文件改名为 ${C}` : '') + '（只报告，未执行）';
+        console.log(`${n} 扫描到 ${m.length} 个视频，识别出 ${$.length} 部作品（${v} 个无番号跳过），模式=${'do' === p ? '整理' : '只报告'}`);
+        let k = 0, b = [];
+        for (let r of $){
+            let n, l = y.get(r), o = r.toUpperCase().replace(/[^A-Z0-9]/g, ''), a = l.every((e)=>e.parentInLibrary && e.parentName && !e.parentName.toUpperCase().replace(/[^A-Z0-9]/g, '').includes(o)), u = 1 === l.length, c = u ? null != (s = null == (d = /\.([A-Za-z0-9]{2,5})$/.exec(l[0].name)) ? void 0 : d[1]) ? s : 'mp4' : '', f = u ? `${r}.${c}` : '', m = !u || l[0].name === f, h = !!(a && m), v = yield S(r), $ = !1;
+            if (h && !v && k < 15 && (k++, $ = !0, v = yield P(e, r)), h && (null == v ? void 0 : v.actress) && l.every((e)=>e.parentName === v.actress)) n = `已整理（文件夹「${l[0].parentName}」）`;
+            else if (v || k < 15) if (v || $ || (k++, v = yield P(e, r)), v && v.actress) if ('report' === p) n = `将归类到「${v.actress}」` + (u && !m ? `，文件改名为 ${f}` : '') + '（只报告，未执行）';
             else {
                 let r = [];
                 try {
-                    let n = w ? yield x(e, w, W.actress) : '';
-                    if (m && !j && (yield function(e, r, n) {
+                    let n = g ? yield j(e, g, v.actress) : '';
+                    if (u && !m && (yield function(e, r, n) {
                         return t(function*() {
                             yield _(e, 'POST', '/file/rename', {}, {
                                 fid: r,
                                 file_name: n
                             });
                         })();
-                    }(e, u[0].fid, C), r.push(`文件已改名为 ${C}`)), n) {
-                        for (let r of u)r.parentFid !== n && (yield function(e, r, n) {
+                    }(e, l[0].fid, f), r.push(`文件已改名为 ${f}`)), n) {
+                        for (let r of l)r.parentFid !== n && (yield function(e, r, n) {
                             return t(function*() {
                                 yield _(e, 'POST', '/file/move', {}, {
                                     action_type: 1,
@@ -567,26 +571,30 @@ loadLibrary = (e)=>t(function*() {
                                 });
                             })();
                         }(e, r.fid, n));
-                        r.push(`已归类到「${W.actress}」`);
+                        r.push(`已归类到「${v.actress}」`);
                     } else r.push('女优文件夹创建失败，未移动');
                 } catch (e) {
                     r.push(`整理失败：${i(e)}`);
                 }
-                a = r.join('；');
+                n = r.join('；');
             }
-            else a = '未查到女优（JavDB 无此番号或网络问题），暂未整理';
-            else a = '待整理（本次查询额度已用完，下次打开继续）';
-            z.push({
+            else n = '未查到女优（JavDB 无此番号或网络问题），暂未整理';
+            else n = '待整理（本次查询额度已用完，下次打开继续）';
+            b.push({
                 code: r,
-                files: u,
-                info: W,
-                status: a
+                files: l,
+                info: v,
+                status: n
             });
         }
-        let N = new Map();
-        if ('do' === b) {
-            for (let r of W.filter((e)=>e.fid !== w && u(e.name)).sort((e, t)=>t.depth - e.depth).slice(0, 60))try {
-                let n = yield j(e, r.fid);
+        let O = new Map();
+        if ('do' === p) {
+            for (let r of h.filter((e)=>{
+                var t;
+                let r;
+                return e.fid !== g && (r = String(null != (t = e.name) ? t : '').toUpperCase(), /(?:^|[^A-Z])FC2[- ]?PPV[- ]?\d{5,7}/.test(r) || /(?:^|[^A-Z])[A-Z]{2,6}-\d{2,6}(?![0-9])/.test(r));
+            }).sort((e, t)=>t.depth - e.depth).slice(0, 60))try {
+                let n = yield x(e, r.fid);
                 0 === n.length && (yield function(e, r) {
                     return t(function*() {
                         yield _(e, 'POST', '/file/delete', {}, {
@@ -597,20 +605,20 @@ loadLibrary = (e)=>t(function*() {
                             ]
                         });
                     })();
-                }(e, r.fid), N.set(r.fid, r.name));
+                }(e, r.fid), O.set(r.fid, r.name));
             } catch (e) {
                 console.log(`${n} 空文件夹清理跳过「${r.name}」: ${i(e)}`);
             }
-            N.size > 0 && console.log(`${n} 已清理空番号文件夹 ${N.size} 个：${[
-                ...N.values()
+            O.size > 0 && console.log(`${n} 已清理空番号文件夹 ${O.size} 个：${[
+                ...O.values()
             ].join('、')}`);
         }
-        let E = z.map(({ code: e, files: t, info: r, status: n })=>{
+        let w = b.map(({ code: e, files: t, info: r, status: n })=>{
             var i;
             let l = n, o = t.map((e)=>{
                 var t;
                 return null != (t = e.parentFid) ? t : '';
-            }).filter((e, t, r)=>e && N.has(e) && r.indexOf(e) === t).map((e)=>N.get(e));
+            }).filter((e, t, r)=>e && O.has(e) && r.indexOf(e) === t).map((e)=>O.get(e));
             o.length > 0 && (l += `；已清理空文件夹「${o.join('」、「')}」`);
             let a = [
                 `番号：${e}`,
@@ -632,7 +640,7 @@ loadLibrary = (e)=>t(function*() {
                 mediaType: 'movie'
             };
         });
-        return console.log(`${n} 片库整理完成：${E.length} 部作品`), E;
+        return console.log(`${n} 片库整理完成：${w.length} 部作品`), w;
     })(), loadDetail = (e, r)=>t(function*() {
         var t, d, m, $, k;
         let b;
@@ -652,9 +660,9 @@ loadLibrary = (e)=>t(function*() {
                 return console.log(`${n} 详情搜索失败: ${i(e)}`), null;
             }
         }
-        let j = yield f(r);
+        let x = yield f(r);
         try {
-            b = yield p(C, j);
+            b = yield p(C, x);
         } catch (e) {
             return console.log(`${n} 详情获取失败: ${i(e)}`), null;
         }
