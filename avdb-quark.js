@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: "JavDB 浏览（最新/Top250/热播与分类榜单/搜索/详情）+ 夸克网盘播放：先按番号搜自己的网盘，未命中时自动搜分享索引并转存到网盘再播，另有 Jable 外部源兜底。使用前请在全局参数中填写自己的夸克网盘 Cookie；如需 JavDB 磁力，请填「JavDB Cookie」（从已登录的浏览器复制）。JavDB 本站对部分地区 IP 有限制，若列表为空请检查代理节点地区（建议非日本节点）。",
     author: 'v7777',
     site: 'https://javdb.com',
-    version: "0.3.2",
+    version: "0.3.3",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -297,17 +297,17 @@ function k(e, l) {
             let g = t(r), h = o(l, null != (a = g.attr('href')) ? a : '');
             if (!h || i.has(h)) return;
             i.add(h);
-            let v = g.find('.video-title strong').first().text().trim(), m = (null != (u = g.attr('title')) ? u : '').trim(), y = g.find('.video-title').first().text().trim(), $ = null != (s = d(v)) ? s : f(m, y), k = m || y || $ || h, _ = null != (c = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? c : '';
-            _ = o(l, _);
-            let b = g.find('.score').first().text(), x = /(\d+(?:\.\d+)?)\s*分/.exec(b), C = g.find('.meta').first().text().trim(), w = /(\d{4}-\d{2}-\d{2})/.exec(C);
+            let v = g.find('.video-title strong').first().text().trim(), m = (null != (u = g.attr('title')) ? u : '').trim(), y = g.find('.video-title').first().text().trim(), $ = null != (s = d(v)) ? s : f(m, y), k = m || y || $ || h, b = null != (c = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? c : '';
+            b = o(l, b);
+            let _ = g.find('.score').first().text(), x = /(\d+(?:\.\d+)?)\s*分/.exec(_), C = g.find('.meta').first().text().trim(), w = /(\d{4}-\d{2}-\d{2})/.exec(C);
             n.push({
                 id: null != $ ? $ : h,
                 type: 'detail',
                 title: k,
                 link: h,
-                posterPath: _ || void 0,
-                coverUrl: _ || void 0,
-                backdropPath: _ || void 0,
+                posterPath: b || void 0,
+                coverUrl: b || void 0,
+                backdropPath: b || void 0,
                 rating: x ? x[1] : void 0,
                 releaseDate: w ? w[1] : void 0,
                 mediaType: 'movie'
@@ -315,12 +315,12 @@ function k(e, l) {
         }), n;
     })();
 }
-function _(e) {
+function b(e) {
     var t;
     let l = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(e), r = (null != (t = null == l ? void 0 : l[1]) ? t : '').replace(/\s+/g, ' ').trim().slice(0, 60) || '(无标题)', n = e.includes('/login') || e.includes('sign_in') || e.includes('登录');
     return `title=${r}, login标记=${n ? '有' : '无'}`;
 }
-function b(e, r) {
+function _(e, r) {
     return t(function*() {
         try {
             let t = yield $(e), n = yield k(t, e);
@@ -330,12 +330,12 @@ function b(e, r) {
                 console.log(`${l} JavDB ${r} 匿名解析为空，带 Cookie 重试`);
                 try {
                     let t = yield $(e, o), n = yield k(t, e);
-                    return console.log(`${l} JavDB ${r}(Cookie重试)：${n.length} 条`), 0 === n.length && console.log(`${l} JavDB ${r}未解析到条目：页面结构可能已变化，或该页需要登录/VIP（页面提示：${_(t)}）`), n;
+                    return console.log(`${l} JavDB ${r}(Cookie重试)：${n.length} 条`), 0 === n.length && console.log(`${l} JavDB ${r}未解析到条目：页面结构可能已变化，或该页需要登录/VIP（页面提示：${b(t)}）`), n;
                 } catch (e) {
                     return console.log(`${l} JavDB ${r}(Cookie重试)失败，已降级为空: ${i(e)}`), [];
                 }
             }
-            return console.log(`${l} JavDB ${r}未解析到条目：页面结构可能已变化，或该页需要登录/VIP（页面提示：${_(t)}）`), n;
+            return console.log(`${l} JavDB ${r}未解析到条目：页面结构可能已变化，或该页需要登录/VIP（页面提示：${b(t)}）`), n;
         } catch (e) {
             return console.log(`${l} JavDB ${r}失败，已降级为空: ${i(e)}`), [];
         }
@@ -349,7 +349,7 @@ function C(e, l, r) {
     return t(function*() {
         yield h(e);
         let t = x(e.period);
-        return b(`${p}/rankings/movies?${a({
+        return _(`${p}/rankings/movies?${a({
             p: t,
             t: l
         })}`, `${r}(${t})`);
@@ -364,18 +364,18 @@ function D(e, t) {
 loadHome = (e)=>t(function*() {
         yield h(e);
         let t = e.genreId || e.peopleId || '';
-        return t ? b(o(p, t), '分类/演员列表') : b(`${p}/`, '首页最新');
+        return t ? _(o(p, t), '分类/演员列表') : _(`${p}/`, '首页最新');
     })(), loadTop250 = (e)=>t(function*() {
         var t;
         yield h(e);
         let r = (null != (t = e.ranking_type) ? t : '').trim();
-        return r && 'all' !== r && console.log(`${l} Top250 ranking_type=${r}：年份筛选形式无公开出处，按全部年份处理`), b(`${p}/rankings/top`, 'Top250');
+        return r && 'all' !== r && console.log(`${l} Top250 ranking_type=${r}：年份筛选形式无公开出处，按全部年份处理`), _(`${p}/rankings/top`, 'Top250');
     })(), loadPlayback = (e)=>t(function*() {
         yield h(e);
         let t = x(e.period);
-        if ('monthly' !== t) return b(`${p}/rankings/playback`, `热播榜(${t})`);
-        let r = yield b(`${p}/rankings/playback?p=monthly`, '热播榜(monthly)');
-        return r.length > 0 ? r : (console.log(`${l} 热播榜(monthly) ?p=monthly 无结果，回退裸路径 /rankings/playback`), b(`${p}/rankings/playback`, '热播榜(monthly回退)'));
+        if ('monthly' !== t) return _(`${p}/rankings/playback`, `热播榜(${t})`);
+        let r = yield _(`${p}/rankings/playback?p=monthly`, '热播榜(monthly)');
+        return r.length > 0 ? r : (console.log(`${l} 热播榜(monthly) ?p=monthly 无结果，回退裸路径 /rankings/playback`), _(`${p}/rankings/playback`, '热播榜(monthly回退)'));
     })(), loadCensored = (e)=>t(function*() {
         return C(e, 'censored', '有码榜');
     })(), loadUncensored = (e)=>t(function*() {
@@ -385,7 +385,7 @@ loadHome = (e)=>t(function*() {
     })(), loadFC2 = (e)=>t(function*() {
         yield h(e);
         let t = x(e.period);
-        return b(`${p}/rankings/movies?${a({
+        return _(`${p}/rankings/movies?${a({
             p: t,
             t: 'fc2'
         })}`, `FC2榜(${t})`);
@@ -393,7 +393,7 @@ loadHome = (e)=>t(function*() {
         var t, r, n;
         yield h(e);
         let i = (null != (t = null != (r = null != (n = e.keyword) ? n : e.title) ? r : e.query) ? t : '').trim();
-        return i ? b(`${p}/search?${a({
+        return i ? _(`${p}/search?${a({
             q: i,
             f: 'all'
         })}`, `搜索「${i}」`) : (console.log(`${l} 搜索关键词为空`), []);
@@ -427,17 +427,17 @@ loadHome = (e)=>t(function*() {
                         $row: i
                     });
                 }), l;
-            }(v), _ = null, b = D($, [
+            }(v), b = null, _ = D($, [
                 '番號',
                 '番号'
             ]);
-            if (b && (_ = d(b.valueText)), !_) {
+            if (_ && (b = d(_.valueText)), !b) {
                 let e = v('nav.panel.movie-panel-info div span').first().text();
-                _ = d(e);
+                b = d(e);
             }
-            _ || (_ = f(v('title').first().text()));
-            let x = v('h2 strong.current-title').first().text().trim(), C = v('h2 span.origin-title').first().text().trim(), S = null != (a = v('meta[property="og:title"]').attr('content')) ? a : '', T = x || S || _ || e, A = null != (u = v('img.video-cover').first().attr('src')) ? u : '';
-            A || (A = null != (s = v('meta[property="og:image"]').attr('content')) ? s : ''), A = o(e, A);
+            b || (b = f(v('title').first().text()));
+            let x = v('h2 strong.current-title').first().text().trim(), C = v('h2 span.origin-title').first().text().trim(), S = null != (a = v('meta[property="og:title"]').attr('content')) ? a : '', A = x || S || b || e, T = null != (u = v('img.video-cover').first().attr('src')) ? u : '';
+            T || (T = null != (s = v('meta[property="og:image"]').attr('content')) ? s : ''), T = o(e, T);
             let q = D($, [
                 '日期'
             ]), P = q ? null == (m = /(\d{4}-\d{2}-\d{2})/.exec(q.valueText)) ? void 0 : m[1] : void 0, B = D($, [
@@ -527,7 +527,7 @@ loadHome = (e)=>t(function*() {
             let N = null != (c = v('video#preview-video source').first().attr('src')) ? c : '';
             N.startsWith('//') && (N = `https:${N}`);
             let V = [];
-            _ && V.push(`番号：${_}`), C && C !== T && V.push(`原标题：${C}`);
+            b && V.push(`番号：${b}`), C && C !== A && V.push(`原标题：${C}`);
             let R = D($, [
                 '片商',
                 '賣家',
@@ -550,22 +550,14 @@ loadHome = (e)=>t(function*() {
             if ((null == H ? void 0 : H.valueText) && V.push(`导演：${H.valueText}`), O.length > 0) for (let e of (V.push(`磁力链接：共 ${O.length} 条`), O.slice(0, 3)))V.push(e);
             else n ? V.push('磁力链接：未获取（已带 JavDB Cookie，仍无磁力——该条目可能无磁力，或 Cookie 已失效）') : V.push('磁力链接：未获取（JavDB 仅对登录用户展示磁力，请在全局参数填写「JavDB Cookie」）');
             let M = {
-                id: null != _ ? _ : e,
-                type: 'url',
-                title: _ ? `${_} 播放` : `${T} 播放`,
-                link: e,
-                coverUrl: A || void 0,
-                posterPath: A || void 0,
-                mediaType: 'movie'
-            }, G = {
-                id: null != _ ? _ : e,
+                id: null != b ? b : e,
                 type: 'detail',
-                title: T,
+                title: A,
                 link: e,
-                posterPath: A || void 0,
-                detailPoster: A || void 0,
-                coverUrl: A || void 0,
-                backdropPath: null != (p = null != (g = E[0]) ? g : A) ? p : void 0,
+                posterPath: T || void 0,
+                detailPoster: T || void 0,
+                coverUrl: T || void 0,
+                backdropPath: null != (p = null != (g = E[0]) ? g : T) ? p : void 0,
                 backdropPaths: E.length > 0 ? E : void 0,
                 releaseDate: P,
                 rating: h,
@@ -578,21 +570,18 @@ loadHome = (e)=>t(function*() {
                 trailers: N ? [
                     {
                         url: N,
-                        coverUrl: A || void 0
+                        coverUrl: T || void 0
                     }
                 ] : void 0,
                 description: V.join('\n'),
-                mediaType: 'movie',
-                episodeItems: [
-                    M
-                ]
+                mediaType: 'movie'
             };
-            return console.log(`${l} JavDB 详情完成：${null != _ ? _ : '(番号未知)'}，演员 ${z.length}，类别 ${j.length}，磁力 ${O.length}`), G;
+            return console.log(`${l} JavDB 详情完成：${null != b ? b : '(番号未知)'}，演员 ${z.length}，类别 ${j.length}，磁力 ${O.length}`), M;
         } catch (e) {
             return console.log(`${l} JavDB 详情解析失败: ${i(e)}`), null;
         }
     })();
-let S = 'https://drive-h.quark.cn/1/clouddrive', T = 'https://drive-pc.quark.cn/1/clouddrive', A = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch', q = 'https://pan.quark.cn', P = 'quark_cookie_dyn', B = 'quark_cookie_base_fp';
+let S = 'https://drive-h.quark.cn/1/clouddrive', A = 'https://drive-pc.quark.cn/1/clouddrive', T = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch', q = 'https://pan.quark.cn', P = 'quark_cookie_dyn', B = 'quark_cookie_base_fp';
 function J(e) {
     let t = 5381;
     for(let l = 0; l < e.length; l++)t = (t << 5) + t + e.charCodeAt(l) | 0;
@@ -656,7 +645,7 @@ function W(e, l, r, n, i, o, u) {
             Cookie: p,
             Accept: 'application/json, text/plain, */*',
             Referer: null != u ? u : q,
-            'User-Agent': A
+            'User-Agent': T
         };
         f = 'GET' === r ? yield Widget.http.get(h, {
             headers: v
@@ -789,7 +778,7 @@ function N(e, r) {
                 customHeaders: {
                     Cookie: l,
                     Referer: q,
-                    'User-Agent': A
+                    'User-Agent': T
                 }
             });
         } catch (e) {
@@ -831,20 +820,31 @@ function R(e, l, r, n) {
 }
 let F = 'https://jable.tv';
 loadResource = (e)=>t(function*() {
-        let d = f(e.id, e.title, e.seriesName, e.link);
-        if (!d) {
-            var p, g;
-            return console.log(`${l} loadResource 未能从参数中提取番号（id=${null != (p = e.id) ? p : ''}，title=${null != (g = e.title) ? g : ''}），返回空`), [];
-        }
+        var d, p, g, v, y;
+        console.log(`${l} loadResource 被调用（id=${null != (d = e.id) ? d : ''}，title=${null != (p = e.title) ? p : ''}，link=${null != (g = e.link) ? g : ''}）`);
+        let $ = [], k = (t)=>{
+            var l;
+            return [
+                {
+                    name: `诊断：${null != t ? t : '番号未知'} 未找到可播放资源`,
+                    description: $.join('；'),
+                    url: null != (l = e.link) ? l : 'https://javdb.com'
+                }
+            ];
+        }, b = f(e.id, e.title, e.seriesName, e.link);
+        if (!b) return console.log(`${l} loadResource 未能从参数中提取番号（id=${null != (v = e.id) ? v : ''}，title=${null != (y = e.title) ? y : ''}），返回空`), $.push('未能从详情参数中提取番号'), k(null);
         yield h(e);
-        let v = 'external-first' === e.sourcePriority, y = [], $ = [], k = ()=>t(function*() {
+        let _ = 'external-first' === e.sourcePriority, x = [], C = [], w = ()=>t(function*() {
                 try {
                     var o;
-                    if (!(null != (o = e.quarkCookie) ? o : '').trim()) return void console.log(`${l} 未填写夸克 Cookie，跳过夸克网盘源`);
+                    if (!(null != (o = e.quarkCookie) ? o : '').trim()) {
+                        console.log(`${l} 未填写夸克 Cookie，跳过夸克网盘源`), $.push('未填写夸克 Cookie，夸克源跳过');
+                        return;
+                    }
                     let u = yield t(function*() {
                         let t = new Set([
-                            c(d)
-                        ]), r = /FC2-PPV-(\d+)/.exec(d);
+                            c(b)
+                        ]), r = /FC2-PPV-(\d+)/.exec(b);
                         r && t.add(`FC2${r[1]}`);
                         let n = [
                             '0'
@@ -877,31 +877,31 @@ loadResource = (e)=>t(function*() {
                         }), o;
                     })();
                     if (u.length > 0) {
-                        console.log(`${l} 夸克命中 ${u.length} 个文件，解析最优文件：${u[0].name}`), y.push(...yield N(e, u[0]));
+                        console.log(`${l} 夸克命中 ${u.length} 个文件，解析最优文件：${u[0].name}`), x.push(...yield N(e, u[0])), 0 === x.length && $.push('夸克网盘命中文件但播放地址解析失败');
                         return;
                     }
-                    console.log(`${l} 夸克网盘中未找到与 ${d} 匹配的视频文件，尝试分享转存`), y.push(...yield t(function*() {
+                    console.log(`${l} 夸克网盘中未找到与 ${b} 匹配的视频文件，尝试分享转存`), $.push('夸克网盘内未搜到该番号'), x.push(...yield t(function*() {
                         let o;
                         if ('off' === e.shareIndexEnabled) return console.log(`${l} 分享索引搜索已关闭，跳过转存`), [];
                         try {
                             o = yield t(function*() {
                                 var t, l, n, i, o;
-                                let u = (null != (t = e.shareIndexBase) ? t : '').trim().replace(/\/+$/, '') || 'https://pansou.app', f = `${u}/api/search?${a({
-                                    kw: d,
+                                let u = (null != (t = e.shareIndexBase) ? t : '').trim().replace(/\/+$/, '') || 'https://pansou.app', d = `${u}/api/search?${a({
+                                    kw: b,
                                     res: 'all',
                                     src: 'all'
-                                })}`, p = yield Widget.http.get(f, {
+                                })}`, f = yield Widget.http.get(d, {
                                     headers: {
                                         'User-Agent': r,
                                         Accept: 'application/json, */*'
                                     }
-                                }), g = 'number' == typeof (null == p ? void 0 : p.statusCode) ? p.statusCode : 200;
-                                if (g >= 400) throw Error(`HTTP ${g}: 分享索引 ${u}`);
-                                let h = s(null == p ? void 0 : p.data);
-                                if (!h) throw Error(`分享索引 ${u} 返回了无法解析的内容`);
-                                if ('number' == typeof h.code && 0 !== h.code) throw Error(`分享索引出错: ${null != (i = h.message) ? i : `code=${h.code}`}`);
-                                let v = null != (l = h.data) ? l : h, m = c(d), y = new Map(), $ = (e, t, l)=>{
-                                    if (y.size >= 12) return;
+                                }), p = 'number' == typeof (null == f ? void 0 : f.statusCode) ? f.statusCode : 200;
+                                if (p >= 400) throw Error(`HTTP ${p}: 分享索引 ${u}`);
+                                let g = s(null == f ? void 0 : f.data);
+                                if (!g) throw Error(`分享索引 ${u} 返回了无法解析的内容`);
+                                if ('number' == typeof g.code && 0 !== g.code) throw Error(`分享索引出错: ${null != (i = g.message) ? i : `code=${g.code}`}`);
+                                let h = null != (l = g.data) ? l : g, v = c(b), m = new Map(), y = (e, t, l)=>{
+                                    if (m.size >= 12) return;
                                     let r = String(null != e ? e : '');
                                     if (!r.includes('quark')) return;
                                     let n = function(e) {
@@ -916,33 +916,33 @@ loadResource = (e)=>t(function*() {
                                         };
                                     }(r);
                                     if (!n) return;
-                                    let i = String(null != l ? l : '').trim(), o = +!O(i).includes(m), a = y.get(n.pwdId);
-                                    a && a.tier <= o || y.set(n.pwdId, {
+                                    let i = String(null != l ? l : '').trim(), o = +!O(i).includes(v), a = m.get(n.pwdId);
+                                    a && a.tier <= o || m.set(n.pwdId, {
                                         url: r,
                                         pwdId: n.pwdId,
                                         passcode: String(null != t ? t : '') || n.passcode,
                                         title: i,
                                         tier: o
                                     });
-                                }, k = null == v || null == (n = v.merged_by_type) ? void 0 : n.quark;
-                                if (Array.isArray(k)) for (let e of k)$(null == e ? void 0 : e.url, null == e ? void 0 : e.password, null != (o = null == e ? void 0 : e.note) ? o : '');
-                                let _ = null == v ? void 0 : v.results;
-                                if (Array.isArray(_)) {
+                                }, $ = null == h || null == (n = h.merged_by_type) ? void 0 : n.quark;
+                                if (Array.isArray($)) for (let e of $)y(null == e ? void 0 : e.url, null == e ? void 0 : e.password, null != (o = null == e ? void 0 : e.note) ? o : '');
+                                let k = null == h ? void 0 : h.results;
+                                if (Array.isArray(k)) {
                                     let e = 0;
-                                    for (let t of _){
-                                        if (e++ >= 300 || y.size >= 12) break;
-                                        for (let e of Array.isArray(null == t ? void 0 : t.links) ? t.links : [])null != e && e.type && 'quark' !== e.type || $(null == e ? void 0 : e.url, null == e ? void 0 : e.password, (null == e ? void 0 : e.work_title) || (null == t ? void 0 : t.title) || '');
+                                    for (let t of k){
+                                        if (e++ >= 300 || m.size >= 12) break;
+                                        for (let e of Array.isArray(null == t ? void 0 : t.links) ? t.links : [])null != e && e.type && 'quark' !== e.type || y(null == e ? void 0 : e.url, null == e ? void 0 : e.password, (null == e ? void 0 : e.work_title) || (null == t ? void 0 : t.title) || '');
                                     }
                                 }
                                 return [
-                                    ...y.values()
+                                    ...m.values()
                                 ].sort((e, t)=>e.tier - t.tier);
                             })();
                         } catch (e) {
                             return console.log(`${l} 分享索引搜索失败，已跳过转存: ${i(e)}`), [];
                         }
-                        if (0 === o.length) return console.log(`${l} 分享索引未找到 ${d} 的夸克分享`), [];
-                        console.log(`${l} 分享索引找到 ${o.length} 个 ${d} 的夸克分享候选`);
+                        if (0 === o.length) return console.log(`${l} 分享索引未找到 ${b} 的夸克分享`), [];
+                        console.log(`${l} 分享索引找到 ${o.length} 个 ${b} 的夸克分享候选`);
                         let u = yield t(function*() {
                             var t, r, o, a, u;
                             let s = (null != (t = e.quarkSaveFid) ? t : '').trim();
@@ -982,8 +982,8 @@ loadResource = (e)=>t(function*() {
                                 console.log(`${l} 解析转存目标目录失败: ${i(e)}`);
                             }
                             return console.log(`${l} 转存目标文件夹 AVDB 不可用，改存网盘根目录`), '0';
-                        })(), f = Math.min(3, o.length);
-                        for(let r = 0; r < f; r++){
+                        })(), d = Math.min(3, o.length);
+                        for(let r = 0; r < d; r++){
                             let a = o[r];
                             try {
                                 let o = yield function(e, l) {
@@ -1013,16 +1013,16 @@ loadResource = (e)=>t(function*() {
                                             ...u
                                         ].sort((e, t)=>t.size - e.size).slice(0, 3)).slice(0, 10);
                                     })();
-                                }(e, a, o, d);
+                                }(e, a, o, b);
                                 if (0 === s.length) {
                                     console.log(`${l} 分享候选 ${r + 1}（${a.title || a.pwdId}）内无视频文件，尝试下一个`);
                                     continue;
                                 }
                                 console.log(`${l} 转存候选 ${r + 1}：${a.title || a.url} → ${s.length} 个文件`);
-                                let f = yield function(e, r, o, a, u) {
+                                let d = yield function(e, r, o, a, u) {
                                     return t(function*() {
                                         var t, s, d;
-                                        let c = Date.now(), { json: f } = yield W(e, T, 'POST', '/share/sharepage/save', {
+                                        let c = Date.now(), { json: f } = yield W(e, A, 'POST', '/share/sharepage/save', {
                                             __dt: String(c % 1000),
                                             __t: String(c)
                                         }, {
@@ -1041,7 +1041,7 @@ loadResource = (e)=>t(function*() {
                                         for(let t = 1; t <= 20 && !(Date.now() - h > 55000); t++){
                                             let r = 3000;
                                             try {
-                                                let { json: l } = yield W(e, T, 'GET', '/task', {
+                                                let { json: l } = yield W(e, A, 'GET', '/task', {
                                                     uc_param_str: '',
                                                     task_id: g,
                                                     retry_index: String(t)
@@ -1058,12 +1058,12 @@ loadResource = (e)=>t(function*() {
                                         return 'pending';
                                     })();
                                 }(e, a, o, s, u);
-                                if ('failed' === f) {
+                                if ('failed' === d) {
                                     console.log(`${l} 分享候选 ${r + 1} 转存任务失败，尝试下一个`);
                                     continue;
                                 }
-                                if ('pending' === f) return console.log(`${l} 转存任务仍在进行中（${d}）：本次先用其他源播放，文件落盘后下次打开将直接命中网盘`), [];
-                                let p = yield function(e, r, o, a) {
+                                if ('pending' === d) return console.log(`${l} 转存任务仍在进行中（${b}）：本次先用其他源播放，文件落盘后下次打开将直接命中网盘`), [];
+                                let f = yield function(e, r, o, a) {
                                     return t(function*() {
                                         let t = new Set(o.map((e)=>O(e))), u = c(a), s = (e)=>{
                                             let l = e.filter((e)=>!e.isDir && (1 === e.category || U(e.name))), r = l.filter((e)=>t.has(O(e.name))), n = r.length > 0 ? r : l.filter((e)=>O(e.name).includes(u));
@@ -1084,69 +1084,70 @@ loadResource = (e)=>t(function*() {
                                         }
                                         return null;
                                     })();
-                                }(e, u, s.map((e)=>e.name), d);
-                                if (!p) return console.log(`${l} 转存已完成但暂未在网盘定位到文件（${d}），下次打开应可直接命中`), [];
-                                return console.log(`${l} 转存完成并定位到文件：${p.name}`), yield N(e, p);
+                                }(e, u, s.map((e)=>e.name), b);
+                                if (!f) return console.log(`${l} 转存已完成但暂未在网盘定位到文件（${b}），下次打开应可直接命中`), [];
+                                return console.log(`${l} 转存完成并定位到文件：${f.name}`), yield N(e, f);
                             } catch (e) {
                                 console.log(`${l} 分享候选 ${r + 1} 转存失败，尝试下一个: ${i(e)}`);
                             }
                         }
-                        return console.log(`${l} 分享转存全部候选失败（${d}）`), [];
-                    })());
+                        return console.log(`${l} 分享转存全部候选失败（${b}）`), [];
+                    })()), 0 === x.length && $.push('分享索引/转存未找到该番号');
                 } catch (e) {
-                    console.log(`${l} 夸克源失败，已降级: ${i(e)}`);
+                    console.log(`${l} 夸克源失败，已降级: ${i(e)}`), $.push(`夸克源出错：${i(e)}`);
                 }
-            })(), _ = ()=>t(function*() {
+            })(), D = ()=>t(function*() {
                 try {
-                    $.push(...yield t(function*() {
+                    let e = yield t(function*() {
                         var e, t, n, i, a;
-                        let s, c = d.toLowerCase(), f = c.replace(/-/g, ''), p = `${F}/search/${encodeURIComponent(c)}/`, g = yield u(p, {
+                        let s, d = b.toLowerCase(), c = d.replace(/-/g, ''), f = `${F}/search/${encodeURIComponent(d)}/`, p = yield u(f, {
                             'User-Agent': r,
                             Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.6',
                             Referer: `${F}/`
                         });
-                        if (m(g)) return console.log(`${l} Jable 搜索被 Cloudflare 验证页拦截`), [];
-                        let h = new Set(), v = /href\s*=\s*["']((?:https:\/\/jable\.tv)?\/videos\/[\w-]+\/?)["']/gi;
-                        for(; null !== (s = v.exec(g));)h.add(o(F, s[1]));
-                        let y = [
-                            ...h
-                        ], $ = null != (e = null != (t = y.find((e)=>e.toLowerCase().includes(c))) ? t : y.find((e)=>e.toLowerCase().replace(/-/g, '').includes(f))) ? e : y[0];
-                        if (!$) return console.log(`${l} Jable 未找到 ${d} 的视频页`), [];
-                        let k = yield u($, {
+                        if (m(p)) return console.log(`${l} Jable 搜索被 Cloudflare 验证页拦截`), [];
+                        let g = new Set(), h = /href\s*=\s*["']((?:https:\/\/jable\.tv)?\/videos\/[\w-]+\/?)["']/gi;
+                        for(; null !== (s = h.exec(p));)g.add(o(F, s[1]));
+                        let v = [
+                            ...g
+                        ], y = null != (e = null != (t = v.find((e)=>e.toLowerCase().includes(d))) ? t : v.find((e)=>e.toLowerCase().replace(/-/g, '').includes(c))) ? e : v[0];
+                        if (!y) return console.log(`${l} Jable 未找到 ${b} 的视频页`), [];
+                        let $ = yield u(y, {
                             'User-Agent': r,
                             Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                             'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.6',
-                            Referer: p
+                            Referer: f
                         });
-                        if (m(k)) return console.log(`${l} Jable 视频页被 Cloudflare 验证页拦截`), [];
-                        let _ = null != (n = null == (i = /var\s+hlsUrl\s*=\s*'([^']+)'/.exec(k)) ? void 0 : i[1]) ? n : null == (a = /var\s+hlsUrl\s*=\s*"([^"]+)"/.exec(k)) ? void 0 : a[1];
-                        return _ ? [
+                        if (m($)) return console.log(`${l} Jable 视频页被 Cloudflare 验证页拦截`), [];
+                        let k = null != (n = null == (i = /var\s+hlsUrl\s*=\s*'([^']+)'/.exec($)) ? void 0 : i[1]) ? n : null == (a = /var\s+hlsUrl\s*=\s*"([^"]+)"/.exec($)) ? void 0 : a[1];
+                        return k ? [
                             {
                                 name: 'Jable',
-                                description: $,
-                                url: _,
+                                description: y,
+                                url: k,
                                 customHeaders: {
-                                    Referer: $,
+                                    Referer: y,
                                     'User-Agent': r
                                 }
                             }
-                        ] : (console.log(`${l} Jable 视频页未解析到 hlsUrl: ${$}`), []);
-                    })());
+                        ] : (console.log(`${l} Jable 视频页未解析到 hlsUrl: ${y}`), []);
+                    })();
+                    C.push(...e), 0 === e.length && $.push('Jable 无结果');
                 } catch (e) {
-                    console.log(`${l} Jable 源失败，已降级: ${i(e)}`);
+                    console.log(`${l} Jable 源失败，已降级: ${i(e)}`), $.push(`Jable 出错：${i(e)}`);
                 }
-                $.push(...yield t(function*() {
-                    return console.log(`${l} MemoJav 源尚未实现（取流需逆向其播放器 JS），跳过 ${d}`), [];
+                C.push(...yield t(function*() {
+                    return console.log(`${l} MemoJav 源尚未实现（取流需逆向其播放器 JS），跳过 ${b}`), [];
                 })());
             })();
-        v ? (yield _(), yield k()) : (yield k(), yield _());
-        let b = v ? [
-            ...$,
-            ...y
+        _ ? (yield D(), yield w()) : (yield w(), yield D());
+        let T = _ ? [
+            ...C,
+            ...x
         ] : [
-            ...y,
-            ...$
+            ...x,
+            ...C
         ];
-        return console.log(`${l} loadResource ${d}：共 ${b.length} 条播放线路`), b;
+        return console.log(`${l} loadResource ${b}：共 ${T.length} 条播放线路`), T.length > 0 ? T : k(b);
     })();
