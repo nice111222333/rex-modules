@@ -45,7 +45,7 @@ WidgetMetadata = {
     description: '夸克网盘 AV 作品批量整理：打开「片库整理」即扫描整个网盘，按番号认出作品，去 JavDB 查女优，把文件改成番号名并按女优归类到「艺术」文件夹（可在参数里改）下的女优文件夹，整理后自动清理艺术内的垃圾文件和空文件夹。同一番号重新下载时，整理会删掉女优文件夹里的旧拷贝（进回收站）、把新文件改名归类到位。播放请用 AVDB夸克版。使用前请在全局参数中填写自己的夸克网盘 Cookie。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.10",
+    version: "0.1.11",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -154,16 +154,16 @@ function d(e) {
 function s(...e) {
     for (let t of e){
         if (!t) continue;
-        let e = u(t);
+        let e = u(t.replace(/(^|[^A-Za-z0-9-])[A-Za-z0-9]+\.(?:com|net|org|vip|xyz|cc|tv|club|info|top)\b/gi, '$1 '));
         if (e) return e;
     }
     return null;
 }
-function f(e) {
+function c(e) {
     return e.toUpperCase().replace(/[^A-Z0-9]/g, '');
 }
-let c = 'https://javdb.com', p = 'javdb_cookie_mirror';
-function m(e) {
+let f = 'https://javdb.com', p = 'javdb_cookie_mirror';
+function g(e) {
     return t(function*() {
         try {
             if (!e || 'string' != typeof e.javdbCookie) return;
@@ -172,7 +172,7 @@ function m(e) {
         } catch (e) {}
     })();
 }
-function g(e) {
+function m(e) {
     return t(function*() {
         if (e && 'string' == typeof e.javdbCookie && e.javdbCookie.trim()) return e.javdbCookie.trim();
         try {
@@ -189,7 +189,7 @@ function h(e, r) {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
             Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.6,ja;q=0.5',
-            Referer: `${c}/`
+            Referer: `${f}/`
         }, r && (i.Cookie = r), n = i, t(function*() {
             let t = yield Widget.http.get(e, {
                 headers: n
@@ -208,16 +208,16 @@ function y(e, r) {
         0 === n.length && (n = t('.movie-list a.box, .grid a.box'));
         let i = [], o = new Set();
         return n.each((e, n)=>{
-            var a, d, f, c, p;
-            let m = t(n), g = l(r, null != (a = m.attr('href')) ? a : '');
-            if (!g || o.has(g)) return;
-            o.add(g);
-            let h = m.find('.video-title strong').first().text().trim(), y = (null != (d = m.attr('title')) ? d : '').trim(), v = m.find('.video-title').first().text().trim(), $ = null != (f = u(h)) ? f : s(y, v), k = null != (c = null != (p = m.find('img').first().attr('src')) ? p : m.find('img').first().attr('data-src')) ? c : '';
-            k = l(r, k), i.push({
+            var a, d, c, f, p;
+            let g = t(n), m = l(r, null != (a = g.attr('href')) ? a : '');
+            if (!m || o.has(m)) return;
+            o.add(m);
+            let h = g.find('.video-title strong').first().text().trim(), y = (null != (d = g.attr('title')) ? d : '').trim(), v = g.find('.video-title').first().text().trim(), $ = null != (c = u(h)) ? c : s(y, v), b = null != (f = null != (p = g.find('img').first().attr('src')) ? p : g.find('img').first().attr('data-src')) ? f : '';
+            b = l(r, b), i.push({
                 code: $,
-                title: y || v || $ || g,
-                link: g,
-                cover: k
+                title: y || v || $ || m,
+                link: m,
+                cover: b
             });
         }), i;
     })();
@@ -244,11 +244,11 @@ function $(e) {
         });
     }), r;
 }
-function k(e, t) {
+function b(e, t) {
     return e.find((e)=>t.includes(e.label));
 }
-function b(e, t) {
-    let r = k(t, [
+function k(e, t) {
+    let r = b(t, [
         '演員',
         '演员'
     ]);
@@ -283,7 +283,7 @@ function b(e, t) {
     return l.filter((e)=>e.name && (!o || e.gender.includes('♀')));
 }
 let x = 'quark_cookie_dyn', C = 'quark_cookie_base_fp';
-function _(e) {
+function S(e) {
     let t = 5381;
     for(let r = 0; r < e.length; r++)t = (t << 5) + t + e.charCodeAt(r) | 0;
     return `${e.length}:${(t >>> 0).toString(16)}`;
@@ -307,35 +307,39 @@ let j = new Set([
     'iso',
     'vob'
 ]);
-function S(e, n, i, l, a) {
+function _(e) {
+    let t = e.lastIndexOf('.');
+    return !(t < 0) && j.has(e.slice(t + 1).toLowerCase());
+}
+function w(e, n, i, l, a) {
     return t(function*() {
         var u, d;
-        let s, f = yield t(function*() {
+        let s, c = yield t(function*() {
             var t;
             let r = (null != (t = e.quarkCookie) ? t : '').trim();
             if (!r) return '';
             try {
-                if ((yield Widget.storage.get(C)) === _(r)) {
+                if ((yield Widget.storage.get(C)) === S(r)) {
                     let e = yield Widget.storage.get(x);
                     if ('string' == typeof e && e.trim()) return e;
                 }
             } catch (e) {}
             return r;
         })();
-        if (!f) throw Error('未填写夸克网盘 Cookie（模块全局参数 quarkCookie）');
-        let c = o(r({
+        if (!c) throw Error('未填写夸克网盘 Cookie（模块全局参数 quarkCookie）');
+        let f = o(r({
             pr: 'ucpro',
             fr: 'pc'
-        }, l)), p = `https://drive.quark.cn/1/clouddrive${i}?${c}`, m = {
-            Cookie: f,
+        }, l)), p = `https://drive.quark.cn/1/clouddrive${i}?${f}`, g = {
+            Cookie: c,
             Accept: 'application/json, text/plain, */*',
             Referer: 'https://pan.quark.cn',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) quark-cloud-drive/2.5.20 Chrome/100.0.4896.160 Electron/18.3.5.4-b478491100 Safari/537.36 Channel/pckk_other_ch'
         };
         s = 'GET' === n ? yield Widget.http.get(p, {
-            headers: m
+            headers: g
         }) : yield Widget.http.post(p, null != a ? a : {}, {
-            headers: m
+            headers: g
         }), yield (u = null == s ? void 0 : s.headers, t(function*() {
             try {
                 var t, r;
@@ -346,7 +350,7 @@ function S(e, n, i, l, a) {
                 Array.isArray(i) || (i = [
                     i
                 ]);
-                let l = f, o = !1;
+                let l = c, o = !1;
                 for (let e of i){
                     let t = String(e).split(';')[0], r = t.indexOf('=');
                     if (r <= 0) continue;
@@ -359,11 +363,11 @@ function S(e, n, i, l, a) {
                         return i || l.push(`${t}=${r}`), l.join('; ');
                     }(l, n, t.slice(r + 1).trim()), o = !0);
                 }
-                o && (yield Widget.storage.set(x, l), yield Widget.storage.set(C, _(n)));
+                o && (yield Widget.storage.set(x, l), yield Widget.storage.set(C, S(n)));
             } catch (e) {}
         })());
-        let g = 'number' == typeof (null == s ? void 0 : s.statusCode) ? s.statusCode : 200;
-        if (g >= 400) throw Error(`HTTP ${g}: 夸克接口 ${i}`);
+        let m = 'number' == typeof (null == s ? void 0 : s.statusCode) ? s.statusCode : 200;
+        if (m >= 400) throw Error(`HTTP ${m}: 夸克接口 ${i}`);
         let h = function(e) {
             if (null == e) return null;
             if ('object' == typeof e) return e;
@@ -377,12 +381,12 @@ function S(e, n, i, l, a) {
         return h;
     })();
 }
-function w(e, r) {
+function A(e, r) {
     return t(function*() {
         let t = [], n = 1;
         for(; n <= 20; n++){
             var i, l, o, a;
-            let u = yield S(e, 'GET', '/file/sort', {
+            let u = yield w(e, 'GET', '/file/sort', {
                 pdir_fid: r,
                 _page: String(n),
                 _size: '100',
@@ -403,17 +407,17 @@ function w(e, r) {
         return t;
     })();
 }
-function A(e, r, n) {
+function O(e, r, n) {
     return t(function*() {
-        yield S(e, 'POST', '/file/rename', {}, {
+        yield w(e, 'POST', '/file/rename', {}, {
             fid: r,
             file_name: n
         });
     })();
 }
-function O(e, r, n) {
+function P(e, r, n) {
     return t(function*() {
-        yield S(e, 'POST', '/file/move', {}, {
+        yield w(e, 'POST', '/file/move', {}, {
             action_type: 1,
             exclude_fids: [],
             filelist: [
@@ -423,9 +427,9 @@ function O(e, r, n) {
         });
     })();
 }
-function P(e, r) {
+function W(e, r) {
     return t(function*() {
-        yield S(e, 'POST', '/file/delete', {}, {
+        yield w(e, 'POST', '/file/delete', {}, {
             action_type: 1,
             exclude_fids: [],
             filelist: [
@@ -434,14 +438,14 @@ function P(e, r) {
         });
     })();
 }
-function W(e, r, l) {
+function z(e, r, l) {
     return t(function*() {
-        let t = (yield w(e, r)).find((e)=>e.isDir && e.name === l);
+        let t = (yield A(e, r)).find((e)=>e.isDir && e.name === l);
         if (t) return t.fid;
         for(let t = 0; t < 2; t++){
             var o, a, u;
             try {
-                let t = yield S(e, 'POST', '/file', {}, {
+                let t = yield w(e, 'POST', '/file', {}, {
                     dir_init_lock: !1,
                     dir_path: '',
                     file_name: l,
@@ -452,7 +456,7 @@ function W(e, r, l) {
                 console.log(`${n} 创建文件夹「${l}」失败（可能已有同名）: ${i(e)}`);
             }
             for(let t = 0; t < 6; t++){
-                let n = null != (a = null == (u = (yield w(e, r)).find((e)=>e.isDir && e.name === l)) ? void 0 : u.fid) ? a : '';
+                let n = null != (a = null == (u = (yield A(e, r)).find((e)=>e.isDir && e.name === l)) ? void 0 : u.fid) ? a : '';
                 if (n) return n;
                 yield function(e) {
                     return new Promise((t)=>{
@@ -464,11 +468,15 @@ function W(e, r, l) {
         return console.log(`${n} 文件夹「${l}」创建后多次确认仍未找到，本次先不移动`), '';
     })();
 }
-let q = 'org_work_';
+function q(e) {
+    let t = String(null != e ? e : '');
+    return /★{2,}/.test(t) || /(手游|手遊|赌场|賭場|澳门|澳門|约炮|約炮)/.test(t);
+}
+let D = 'org_work_';
 function N(e) {
     return t(function*() {
         try {
-            let l = yield Widget.storage.get(q + e.toUpperCase());
+            let l = yield Widget.storage.get(D + e.toUpperCase());
             if ('string' == typeof l && l) {
                 let e = JSON.parse(l);
                 if (e && 'object' == typeof e) {
@@ -493,26 +501,26 @@ function T(e, r) {
         try {
             u = yield t(function*() {
                 var t, n, i, a, u, d;
-                let s = `${c}/search?${o({
+                let s = `${f}/search?${o({
                     q: r,
                     f: 'all'
-                })}`, f = yield h(s), p = yield y(f, s);
+                })}`, c = yield h(s), p = yield y(c, s);
                 if (0 === p.length) return null;
-                let m = null != (t = p.find((e)=>e.code === r)) ? t : p[0], v = yield g(e), k = yield h(m.link, v), x = yield Widget.html.load(k), C = $(x), _ = b(x, C), j = null != (n = x('img.video-cover').first().attr('src')) ? n : '';
-                j || (j = null != (i = x('meta[property="og:image"]').attr('content')) ? i : ''), j = l(m.link, j) || m.cover;
-                let S = x('h2 strong.current-title').first().text().trim(), w = null != (a = x('meta[property="og:title"]').attr('content')) ? a : '';
+                let g = null != (t = p.find((e)=>e.code === r)) ? t : p[0], v = yield m(e), b = yield h(g.link, v), x = yield Widget.html.load(b), C = $(x), S = k(x, C), j = null != (n = x('img.video-cover').first().attr('src')) ? n : '';
+                j || (j = null != (i = x('meta[property="og:image"]').attr('content')) ? i : ''), j = l(g.link, j) || g.cover;
+                let _ = x('h2 strong.current-title').first().text().trim(), w = null != (a = x('meta[property="og:title"]').attr('content')) ? a : '';
                 return {
-                    actress: (null != (u = null == (d = _[0]) ? void 0 : d.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
+                    actress: (null != (u = null == (d = S[0]) ? void 0 : d.name) ? u : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
                     cover: j,
-                    title: S || w || m.title,
-                    link: m.link
+                    title: _ || w || g.title,
+                    link: g.link
                 };
             })();
         } catch (e) {
             console.log(`${n} JavDB 查询 ${r} 失败: ${i(e)}`);
         }
         if (u) try {
-            yield Widget.storage.set(q + r.toUpperCase(), JSON.stringify({
+            yield Widget.storage.set(D + r.toUpperCase(), JSON.stringify({
                 a: u.actress,
                 c: u.cover,
                 t: u.title,
@@ -523,15 +531,15 @@ function T(e, r) {
     })();
 }
 loadLibrary = (e)=>t(function*() {
-        var l, o, a, u, c, p, g, h;
-        yield m(e);
+        var l, o, a, u, f, p, m, h;
+        yield g(e);
         let y = (null != (l = e.organizeMode) ? l : 'do') === 'report' ? 'report' : 'do', v = yield (h = 'do' === y, t(function*() {
             var t;
             let r = (null != (t = e.libraryRoot) ? t : '').trim();
             if ('/' === r) return '0';
-            let n = '' === r ? '艺术' : r, i = (yield w(e, '0')).find((e)=>e.isDir && e.name === n);
-            return i ? i.fid : h ? W(e, '0', n) : '';
-        })()), { videos: $, folders: k } = yield t(function*() {
+            let n = '' === r ? '艺术' : r, i = (yield A(e, '0')).find((e)=>e.isDir && e.name === n);
+            return i ? i.fid : h ? z(e, '0', n) : '';
+        })()), { videos: $, folders: b } = yield t(function*() {
             let t = [
                 {
                     fid: '0',
@@ -539,32 +547,29 @@ loadLibrary = (e)=>t(function*() {
                 }
             ], l = [], o = [], a = new Map(), u = new Set(), d = 0, s = 0;
             for(; t.length > 0 && d < 120 && s < 8000;){
-                let c, { fid: p, depth: m } = t.shift();
+                let f, { fid: p, depth: g } = t.shift();
                 d++;
                 try {
-                    c = yield w(e, p);
+                    f = yield A(e, p);
                 } catch (e) {
                     console.log(`${n} 目录 ${p} 列取失败，跳过: ${i(e)}`);
                     continue;
                 }
-                for (let e of c){
-                    var f;
+                for (let e of f){
+                    var c;
                     if (s++, e.isDir) {
                         a.set(e.fid, e.name), o.push({
                             fid: e.fid,
                             name: e.name,
-                            depth: m + 1,
+                            depth: g + 1,
                             parentFid: p
                         }), p === v && u.add(e.fid), t.push({
                             fid: e.fid,
-                            depth: m + 1
+                            depth: g + 1
                         });
                         continue;
                     }
-                    (1 === e.category || function(e) {
-                        let t = e.lastIndexOf('.');
-                        return !(t < 0) && j.has(e.slice(t + 1).toLowerCase());
-                    }(e.name)) && l.push(function(e, t) {
+                    (1 === e.category || _(e.name)) && l.push(function(e, t) {
                         return t = null != t ? t : {}, Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : (function(e) {
                             var t = Object.keys(e);
                             if (Object.getOwnPropertySymbols) {
@@ -577,7 +582,7 @@ loadLibrary = (e)=>t(function*() {
                         }), e;
                     }(r({}, e), {
                         parentFid: p,
-                        parentName: null != (f = a.get(p)) ? f : '',
+                        parentName: null != (c = a.get(p)) ? c : '',
                         parentInLibrary: u.has(p)
                     }));
                 }
@@ -586,23 +591,24 @@ loadLibrary = (e)=>t(function*() {
                 videos: l,
                 folders: o
             };
-        })(), b = new Map(), x = 0;
+        })(), k = new Map(), x = 0;
         for (let e of $){
+            if (q(e.name)) continue;
             let t = null != (o = s(e.name)) ? o : s(e.parentName);
             if (!t) {
                 x++;
                 continue;
             }
-            let r = null != (a = b.get(t)) ? a : [];
-            r.push(e), b.set(t, r);
+            let r = null != (a = k.get(t)) ? a : [];
+            r.push(e), k.set(t, r);
         }
         let C = [
-            ...b.keys()
+            ...k.keys()
         ].sort();
         console.log(`${n} 扫描到 ${$.length} 个视频，识别出 ${C.length} 部作品（${x} 个无番号跳过），模式=${'do' === y ? '整理' : '只报告'}`);
-        let _ = 0, S = new Set(), q = [];
+        let S = 0, j = new Set(), w = [];
         for (let t of C){
-            let r, n = b.get(t), l = t.toUpperCase().replace(/[^A-Z0-9]/g, ''), o = (e)=>!!(e.parentInLibrary && e.parentName && !f(e.parentName).includes(l)), a = (e)=>{
+            let r, n = k.get(t), l = t.toUpperCase().replace(/[^A-Z0-9]/g, ''), o = (e)=>!!(e.parentInLibrary && e.parentName && !c(e.parentName).includes(l)), a = (e)=>{
                 var r, n;
                 let i = null != (r = null == (n = /\.([A-Za-z0-9]{2,5})$/.exec(e.name)) ? void 0 : n[1]) ? r : '';
                 return '' !== i && e.name === `${t}.${i}`;
@@ -613,18 +619,18 @@ loadLibrary = (e)=>t(function*() {
             }
             if (d && s) {
                 let r, l = d, o = s, a = yield N(t);
-                !a && _ < 15 && (_++, a = yield T(e, t));
-                let u = null != (p = null == (g = /\.([A-Za-z0-9]{2,5})$/.exec(o.name)) ? void 0 : g[1]) ? p : 'mp4', f = `${t}.${u}`;
-                if ('report' === y) r = `将替换旧拷贝：删除「${l.parentName}」里的旧文件「${l.name}」，新文件改名为 ${f} 并归类到「${l.parentName}」（只报告，未执行）`;
+                !a && S < 15 && (S++, a = yield T(e, t));
+                let u = null != (p = null == (m = /\.([A-Za-z0-9]{2,5})$/.exec(o.name)) ? void 0 : m[1]) ? p : 'mp4', c = `${t}.${u}`;
+                if ('report' === y) r = `将替换旧拷贝：删除「${l.parentName}」里的旧文件「${l.name}」，新文件改名为 ${c} 并归类到「${l.parentName}」（只报告，未执行）`;
                 else {
                     let t = [];
                     try {
-                        yield P(e, l.fid), t.push(`旧文件「${l.name}」已删除（在回收站，可恢复）`), o.name !== f && (yield A(e, o.fid, f), t.push(`新文件已改名为 ${f}`)), o.parentFid !== l.parentFid && (yield O(e, o.fid, l.parentFid)), t.push(`已归类到「${l.parentName}」`), r = `已替换旧拷贝：${t.join('；')}`;
+                        yield W(e, l.fid), t.push(`旧文件「${l.name}」已删除（在回收站，可恢复）`), o.name !== c && (yield O(e, o.fid, c), t.push(`新文件已改名为 ${c}`)), o.parentFid !== l.parentFid && (yield P(e, o.fid, l.parentFid)), t.push(`已归类到「${l.parentName}」`), r = `已替换旧拷贝：${t.join('；')}`;
                     } catch (e) {
                         r = `替换旧拷贝未完成${t.length > 0 ? `（已完成：${t.join('；')}）` : ''}：出错：${i(e)}`;
                     }
                 }
-                (null == a ? void 0 : a.actress) && S.add(a.actress), l.parentName && S.add(l.parentName), q.push({
+                (null == a ? void 0 : a.actress) && j.add(a.actress), l.parentName && j.add(l.parentName), w.push({
                     code: t,
                     files: n,
                     info: a,
@@ -632,16 +638,16 @@ loadLibrary = (e)=>t(function*() {
                 });
                 continue;
             }
-            let m = n.every((e)=>e.parentInLibrary && e.parentName && !f(e.parentName).includes(l)), h = 1 === n.length, $ = h ? null != (u = null == (c = /\.([A-Za-z0-9]{2,5})$/.exec(n[0].name)) ? void 0 : c[1]) ? u : 'mp4' : '', k = h ? `${t}.${$}` : '', x = !h || n[0].name === k, C = !!(m && x), j = yield N(t), w = !1;
-            if (C && !j && _ < 15 && (_++, w = !0, j = yield T(e, t)), C && (null == j ? void 0 : j.actress) && n.every((e)=>e.parentName === j.actress)) r = `已整理（文件夹「${n[0].parentName}」）`;
-            else if (j || _ < 15) if (j || w || (_++, j = yield T(e, t)), j && j.actress) if ('report' === y) r = `将归类到「${j.actress}」` + (h && !x ? `，文件改名为 ${k}` : '') + '（只报告，未执行）';
+            let g = n.every((e)=>e.parentInLibrary && e.parentName && !c(e.parentName).includes(l)), h = 1 === n.length, $ = h ? null != (u = null == (f = /\.([A-Za-z0-9]{2,5})$/.exec(n[0].name)) ? void 0 : f[1]) ? u : 'mp4' : '', b = h ? `${t}.${$}` : '', x = !h || n[0].name === b, C = !!(g && x), _ = yield N(t), A = !1;
+            if (C && !_ && S < 15 && (S++, A = !0, _ = yield T(e, t)), C && (null == _ ? void 0 : _.actress) && n.every((e)=>e.parentName === _.actress)) r = `已整理（文件夹「${n[0].parentName}」）`;
+            else if (_ || S < 15) if (_ || A || (S++, _ = yield T(e, t)), _ && _.actress) if ('report' === y) r = `将归类到「${_.actress}」` + (h && !x ? `，文件改名为 ${b}` : '') + '（只报告，未执行）';
             else {
                 let t = [];
                 try {
-                    let r = v ? yield W(e, v, j.actress) : '';
-                    if (h && !x && (yield A(e, n[0].fid, k), t.push(`文件已改名为 ${k}`)), r) {
-                        for (let t of n)t.parentFid !== r && (yield O(e, t.fid, r));
-                        t.push(`已归类到「${j.actress}」`);
+                    let r = v ? yield z(e, v, _.actress) : '';
+                    if (h && !x && (yield O(e, n[0].fid, b), t.push(`文件已改名为 ${b}`)), r) {
+                        for (let t of n)t.parentFid !== r && (yield P(e, t.fid, r));
+                        t.push(`已归类到「${_.actress}」`);
                     } else t.push('女优文件夹创建失败，未移动');
                 } catch (e) {
                     t.push(`整理失败：${i(e)}`);
@@ -650,10 +656,10 @@ loadLibrary = (e)=>t(function*() {
             }
             else r = '未查到女优（JavDB 无此番号或网络问题），暂未整理';
             else r = '待整理（本次查询额度已用完，下次打开继续）';
-            (null == j ? void 0 : j.actress) && S.add(j.actress), q.push({
+            (null == _ ? void 0 : _.actress) && j.add(_.actress), w.push({
                 code: t,
                 files: n,
-                info: j,
+                info: _,
                 status: r
             });
         }
@@ -662,14 +668,14 @@ loadLibrary = (e)=>t(function*() {
             let t = new Set(v ? [
                 v
             ] : []), r = !0;
-            for(; r;)for (let e of (r = !1, k))t.has(e.parentFid) && !t.has(e.fid) && (t.add(e.fid), r = !0);
+            for(; r;)for (let e of (r = !1, b))t.has(e.parentFid) && !t.has(e.fid) && (t.add(e.fid), r = !0);
             let l = new Set();
-            for (let e of (v && l.add(v), k))(t.has(e.fid) || d(e.name)) && !S.has(e.name) && l.add(e.fid);
+            for (let e of (v && l.add(v), b))(t.has(e.fid) || d(e.name)) && !j.has(e.name) && l.add(e.fid);
             let o = [];
             for (let t of l){
                 let r;
                 try {
-                    r = yield w(e, t);
+                    r = yield A(e, t);
                 } catch (e) {
                     continue;
                 }
@@ -677,14 +683,31 @@ loadLibrary = (e)=>t(function*() {
                     let t = String(null != e ? e : '').toLowerCase();
                     return !!(/\.(url|html?|mht|lnk)$/.test(t) || /\.txt$/.test(t) && /(最新地址|发布页|发布頁|永久地址|网址|會所|会所|论坛|論壇|\.com|\.net|\.xyz|\.top|http|www\.|@)/.test(t));
                 }(t.name)) try {
-                    yield P(e, t.fid), o.push(t.name);
+                    yield W(e, t.fid), o.push(t.name);
                 } catch (e) {
                     console.log(`${n} 垃圾文件删除跳过「${t.name}」: ${i(e)}`);
                 }
             }
-            for (let r of (o.length > 0 && console.log(`${n} 已清理垃圾文件 ${o.length} 个：${o.join('、')}`), k.filter((e)=>e.fid !== v && !!(t.has(e.fid) && !S.has(e.name) || d(e.name) || '0' === e.parentFid && S.has(e.name))).sort((e, t)=>t.depth - e.depth).slice(0, 60)))try {
-                let t = yield w(e, r.fid);
-                0 === t.length && (yield P(e, r.fid), D.set(r.fid, r.name));
+            o.length > 0 && console.log(`${n} 已清理垃圾文件 ${o.length} 个：${o.join('、')}`);
+            let a = new Set();
+            for (let e of (v && a.add(v), b))(t.has(e.fid) || d(e.name)) && a.add(e.fid);
+            let u = [];
+            for (let t of a){
+                let r;
+                try {
+                    r = yield A(e, t);
+                } catch (e) {
+                    continue;
+                }
+                for (let t of r)if (!t.isDir && q(t.name) && (1 === t.category || _(t.name))) try {
+                    yield W(e, t.fid), u.push(t.name);
+                } catch (e) {
+                    console.log(`${n} 广告视频删除跳过「${t.name}」: ${i(e)}`);
+                }
+            }
+            for (let r of (u.length > 0 && console.log(`${n} 已清理广告视频 ${u.length} 个：${u.join('、')}`), b.filter((e)=>e.fid !== v && !!(t.has(e.fid) && !j.has(e.name) || d(e.name) || '0' === e.parentFid && j.has(e.name))).sort((e, t)=>t.depth - e.depth).slice(0, 60)))try {
+                let t = yield A(e, r.fid);
+                0 === t.length && (yield W(e, r.fid), D.set(r.fid, r.name));
             } catch (e) {
                 console.log(`${n} 空文件夹清理跳过「${r.name}」: ${i(e)}`);
             }
@@ -692,7 +715,7 @@ loadLibrary = (e)=>t(function*() {
                 ...D.values()
             ].join('、')}`);
         }
-        let z = q.map(({ code: e, files: t, info: r, status: n })=>{
+        let Z = w.map(({ code: e, files: t, info: r, status: n })=>{
             var i;
             let l = n, o = t.map((e)=>{
                 var t;
@@ -719,17 +742,17 @@ loadLibrary = (e)=>t(function*() {
                 mediaType: 'movie'
             };
         });
-        return console.log(`${n} 片库整理完成：${z.length} 部作品`), z;
+        return console.log(`${n} 片库整理完成：${Z.length} 部作品`), Z;
     })(), loadDetail = (e, r)=>t(function*() {
-        var t, a, d, f, p;
+        var t, a, d, c, p;
         let v;
         if (!e) return null;
-        yield m(r);
+        yield g(r);
         let x = e, C = null;
         if (e.startsWith('organizer:')) {
             if (!(C = u(e.slice(10)))) return null;
             try {
-                let e = `${c}/search?${o({
+                let e = `${f}/search?${o({
                     q: C,
                     f: 'all'
                 })}`, r = yield h(e), n = yield y(r, e), i = null != (t = n.find((e)=>e.code === C)) ? t : n[0];
@@ -739,35 +762,35 @@ loadLibrary = (e)=>t(function*() {
                 return console.log(`${n} 详情搜索失败: ${i(e)}`), null;
             }
         }
-        let _ = yield g(r);
+        let S = yield m(r);
         try {
-            v = yield h(x, _);
+            v = yield h(x, S);
         } catch (e) {
             return console.log(`${n} 详情获取失败: ${i(e)}`), null;
         }
         try {
-            let e = yield Widget.html.load(v), t = $(e), r = C, n = k(t, [
+            let e = yield Widget.html.load(v), t = $(e), r = C, n = b(t, [
                 '番號',
                 '番号'
             ]);
             n && (r = null != (a = u(n.valueText)) ? a : r), r || (r = s(e('title').first().text()));
-            let i = e('h2 strong.current-title').first().text().trim(), o = null != (d = e('meta[property="og:title"]').attr('content')) ? d : '', c = i || o || r || x, m = null != (f = e('img.video-cover').first().attr('src')) ? f : '';
-            m || (m = null != (p = e('meta[property="og:image"]').attr('content')) ? p : ''), m = l(x, m);
-            let g = b(e, t).map((e)=>({
+            let i = e('h2 strong.current-title').first().text().trim(), o = null != (d = e('meta[property="og:title"]').attr('content')) ? d : '', f = i || o || r || x, g = null != (c = e('img.video-cover').first().attr('src')) ? c : '';
+            g || (g = null != (p = e('meta[property="og:image"]').attr('content')) ? p : ''), g = l(x, g);
+            let m = k(e, t).map((e)=>({
                     id: e.href || e.name,
                     title: e.name,
                     role: '演员'
                 })), h = [];
-            return r && h.push(`番号：${r}`), g.length > 0 && h.push(`女优：${g.map((e)=>e.title).join('、')}`), h.push('播放资源由 AVDB夸克版 提供（夸克原画 / MemoJav 等）。'), {
+            return r && h.push(`番号：${r}`), m.length > 0 && h.push(`女优：${m.map((e)=>e.title).join('、')}`), h.push('播放资源由 AVDB夸克版 提供（夸克原画 / MemoJav 等）。'), {
                 id: null != r ? r : x,
                 type: 'detail',
-                title: c,
+                title: f,
                 link: x,
-                posterPath: m || void 0,
-                detailPoster: m || void 0,
-                coverUrl: m || void 0,
-                backdropPath: m || void 0,
-                peoples: g.length > 0 ? g : void 0,
+                posterPath: g || void 0,
+                detailPoster: g || void 0,
+                coverUrl: g || void 0,
+                backdropPath: g || void 0,
+                peoples: m.length > 0 ? m : void 0,
                 description: h.join('\n'),
                 mediaType: 'movie'
             };
