@@ -28,7 +28,7 @@ WidgetMetadata = {
     description: '你的夸克网盘片库（经 AList WebDAV 播放）：按番号列出网盘「艺术」里的作品，封面和信息取自 JavDB，播放走 AList WebDAV（流畅）。需先把夸克挂载到 AList，并在全局参数中填写 AList 地址、令牌和账号密码。把「我的片库」添加到首页即可当片库分区用。',
     author: 'v7777',
     site: 'https://pan.quark.cn',
-    version: "0.1.4",
+    version: "0.1.5",
     requiredVersion: '0.0.2',
     detailCacheDuration: 60,
     globalParams: [
@@ -325,7 +325,7 @@ function L(e) {
     let i = (null != (t = e.alistRoot) ? t : '').trim();
     return '' === i ? '/夸克/艺术' : '/' === i ? '/' : (i.startsWith('/') ? i : `/${i}`).replace(/\/+$/, '');
 }
-function S(e, i, r) {
+function w(e, i, r) {
     return t(function*() {
         var t, l;
         let o, u = `${x(e)}${i}`;
@@ -353,12 +353,12 @@ function S(e, i, r) {
         return s.data;
     })();
 }
-function w(e, i) {
+function S(e, i) {
     return t(function*() {
         let t = [], n = 1;
         for(;;){
             var r, l, o, u, a;
-            let s = yield S(e, '/api/fs/list', {
+            let s = yield w(e, '/api/fs/list', {
                 path: i,
                 password: '',
                 page: n,
@@ -427,7 +427,7 @@ loadLibrary = (e)=>t(function*() {
                     let t, f = r.shift();
                     u++;
                     try {
-                        t = yield w(e, f);
+                        t = yield S(e, f);
                     } catch (e) {
                         console.log(`${i} 目录 ${f} 列取失败，跳过: ${n(e)}`);
                         continue;
@@ -483,11 +483,11 @@ loadLibrary = (e)=>t(function*() {
                             if (0 === p.length) return null;
                             let v = null != (t = p.find((e)=>e.code === o)) ? t : p[0], y = yield h(e), b = yield g(v.link, y), C = yield Widget.html.load(b), k = $(C), x = A(C, k), L = null != (i = C('img.video-cover').first().attr('src')) ? i : '';
                             L || (L = null != (n = C('meta[property="og:image"]').attr('content')) ? n : ''), L = r(v.link, L) || v.cover;
-                            let S = C('h2 strong.current-title').first().text().trim(), w = null != (u = C('meta[property="og:title"]').attr('content')) ? u : '';
+                            let w = C('h2 strong.current-title').first().text().trim(), S = null != (u = C('meta[property="og:title"]').attr('content')) ? u : '';
                             return {
                                 actress: (null != (a = null == (s = x[0]) ? void 0 : s.name) ? a : '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim().slice(0, 60),
                                 cover: L,
-                                title: S || w || v.title,
+                                title: w || S || v.title,
                                 link: v.link
                             };
                         })();
@@ -569,9 +569,9 @@ loadLibrary = (e)=>t(function*() {
             };
             k = r.link;
         }
-        let S = yield h(C);
+        let w = yield h(C);
         try {
-            b = yield g(k, S);
+            b = yield g(k, w);
         } catch (e) {
             return console.log(`${i} 详情获取失败: ${n(e)}`), null;
         }
@@ -605,27 +605,27 @@ loadLibrary = (e)=>t(function*() {
             return console.log(`${i} 详情解析失败: ${n(e)}`), null;
         }
     })(), loadResource = (e)=>t(function*() {
-        var r, l, o, u, c, f, p;
+        var r, l, o, u, c, f, p, h;
         console.log(`${i} loadResource 被调用（id=${null != (r = e.id) ? r : ''}，title=${null != (l = e.title) ? l : ''}，link=${null != (o = e.link) ? o : ''}）`);
-        let h = (e)=>[
+        let g = (null != (u = e.link) ? u : '').startsWith('qwebdav:'), m = (e)=>g ? [
                 {
                     name: e,
                     description: '诊断占位条目，不可播放；对应来源恢复后自动消失',
                     url: 'https://pan.quark.cn'
                 }
-            ], g = s(e.id, e.title, e.seriesName, e.link);
-        if (!g) return h('诊断·番号：未能识别');
-        if (!k(e)) return h('诊断·AList：未配置');
+            ] : (console.log(`${i} loadResource 外部条目静默跳过（${e}）`), []), v = s(e.id, e.title, e.seriesName, e.link);
+        if (!v) return m('诊断·番号：未能识别');
+        if (!k(e)) return m('诊断·AList：未配置');
         try {
-            let r = null, l = null != (u = e.link) ? u : '';
+            let r = null, l = null != (c = e.link) ? c : '';
             if (l.startsWith('qwebdav:')) {
                 let i = l.slice(8);
                 try {
                     i = decodeURIComponent(i);
                 } catch (e) {}
-                r = yield (f = i, t(function*() {
-                    let t = f.lastIndexOf('/'), i = t > 0 ? f.slice(0, t) : '/', n = f.slice(t + 1), r = {
-                        path: f,
+                r = yield (p = i, t(function*() {
+                    let t = p.lastIndexOf('/'), i = t > 0 ? p.slice(0, t) : '/', n = p.slice(t + 1), r = {
+                        path: p,
                         name: n,
                         size: 0,
                         sign: '',
@@ -634,15 +634,15 @@ loadLibrary = (e)=>t(function*() {
                     };
                     try {
                         var l;
-                        return null != (l = (yield w(e, i)).find((e)=>!e.isDir && e.name === n)) ? l : r;
+                        return null != (l = (yield S(e, i)).find((e)=>!e.isDir && e.name === n)) ? l : r;
                     } catch (e) {
                         return r;
                     }
                 })());
-            } else r = null != (c = (yield t(function*() {
+            } else r = null != (f = (yield t(function*() {
                 let t = new Set([
-                    a(g)
-                ]), r = /FC2-PPV-(\d+)/.exec(g);
+                    a(v)
+                ]), r = /FC2-PPV-(\d+)/.exec(v);
                 r && t.add(`FC2${r[1]}`);
                 let l = L(e), o = [
                     l
@@ -656,7 +656,7 @@ loadLibrary = (e)=>t(function*() {
                     let r, l = o.shift();
                     f++;
                     try {
-                        r = yield w(e, l);
+                        r = yield S(e, l);
                     } catch (e) {
                         console.log(`${i} AList 目录 ${l} 列取失败，跳过: ${n(e)}`);
                         continue;
@@ -687,11 +687,11 @@ loadLibrary = (e)=>t(function*() {
                     }
                 }
                 return (s.sort((e, t)=>t.size - e.size), s.length > 0) ? s : (c.sort((e, t)=>t.size - e.size), c.slice(0, 3));
-            })())[0]) ? c : null;
-            if (!r) return h('诊断·AList：未找到');
-            let o = yield (p = r, t(function*() {
+            })())[0]) ? f : null;
+            if (!r) return m('诊断·AList：未找到');
+            let o = yield (h = r, t(function*() {
                 var t, r, l;
-                let o = x(e), u = p.path.split('/').map((e)=>encodeURIComponent(e)).join('/'), a = D(p.size), s = `${p.name}${a ? ` · ${a}` : ''}`, d = [], c = (null != (t = e.alistUser) ? t : '').trim();
+                let o = x(e), u = h.path.split('/').map((e)=>encodeURIComponent(e)).join('/'), a = D(h.size), s = `${h.name}${a ? ` · ${a}` : ''}`, d = [], c = (null != (t = e.alistUser) ? t : '').trim();
                 c && d.push({
                     name: 'WebDAV原画',
                     description: `${s} · 经 AList WebDAV 播放`,
@@ -713,14 +713,14 @@ loadLibrary = (e)=>t(function*() {
                             }(t);
                         }(`${c}:${null != (r = e.alistPass) ? r : ''}`)}`
                     }
-                }), p.sign && d.push({
+                }), h.sign && d.push({
                     name: 'AList代理原画',
                     description: `${s} · 经 AList 代理播放`,
-                    url: `${o}/p${u}?sign=${encodeURIComponent(p.sign)}`
+                    url: `${o}/p${u}?sign=${encodeURIComponent(h.sign)}`
                 });
                 try {
-                    let t = yield S(e, '/api/fs/get', {
-                        path: p.path,
+                    let t = yield w(e, '/api/fs/get', {
+                        path: h.path,
                         password: ''
                     }), i = String(null != (l = null == t ? void 0 : t.raw_url) ? l : '');
                     i && d.push({
@@ -733,9 +733,9 @@ loadLibrary = (e)=>t(function*() {
                 }
                 return d;
             })());
-            if (0 === o.length) return h('诊断·AList：命中但无可用链接');
-            return console.log(`${i} loadResource ${g}：共 ${o.length} 条播放线路`), o;
+            if (0 === o.length) return m('诊断·AList：命中但无可用链接');
+            return console.log(`${i} loadResource ${v}：共 ${o.length} 条播放线路`), o;
         } catch (e) {
-            return console.log(`${i} AList 源失败: ${n(e)}`), h('诊断·AList：出错');
+            return console.log(`${i} AList 源失败: ${n(e)}`), m('诊断·AList：出错');
         }
     })();
