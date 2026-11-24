@@ -1,22 +1,22 @@
-function e(e, t, r, i, n, l, o) {
+function e(e, t, r, n, i, l, o) {
     try {
         var a = e[l](o), u = a.value;
     } catch (e) {
         r(e);
         return;
     }
-    a.done ? t(u) : Promise.resolve(u).then(i, n);
+    a.done ? t(u) : Promise.resolve(u).then(n, i);
 }
 function t(t) {
     return function() {
-        var r = this, i = arguments;
-        return new Promise(function(n, l) {
-            var o = t.apply(r, i);
+        var r = this, n = arguments;
+        return new Promise(function(i, l) {
+            var o = t.apply(r, n);
             function a(t) {
-                e(o, n, l, a, u, "next", t);
+                e(o, i, l, a, u, "next", t);
             }
             function u(t) {
-                e(o, n, l, a, u, "throw", t);
+                e(o, i, l, a, u, "throw", t);
             }
             a(void 0);
         });
@@ -24,22 +24,22 @@ function t(t) {
 }
 function r(e) {
     for(var t = 1; t < arguments.length; t++){
-        var r = null != arguments[t] ? arguments[t] : {}, i = Object.keys(r);
-        "function" == typeof Object.getOwnPropertySymbols && (i = i.concat(Object.getOwnPropertySymbols(r).filter(function(e) {
+        var r = null != arguments[t] ? arguments[t] : {}, n = Object.keys(r);
+        "function" == typeof Object.getOwnPropertySymbols && (n = n.concat(Object.getOwnPropertySymbols(r).filter(function(e) {
             return Object.getOwnPropertyDescriptor(r, e).enumerable;
-        }))), i.forEach(function(t) {
-            var i;
-            i = r[t], t in e ? Object.defineProperty(e, t, {
-                value: i,
+        }))), n.forEach(function(t) {
+            var n;
+            n = r[t], t in e ? Object.defineProperty(e, t, {
+                value: n,
                 enumerable: !0,
                 configurable: !0,
                 writable: !0
-            }) : e[t] = i;
+            }) : e[t] = n;
         });
     }
     return e;
 }
-function i(e, t) {
+function n(e, t) {
     return t = null != t ? t : {}, Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : (function(e) {
         var t = Object.keys(e);
         if (Object.getOwnPropertySymbols) {
@@ -54,10 +54,10 @@ function i(e, t) {
 WidgetMetadata = {
     id: 'v7777-douban',
     title: '豆瓣影视',
-    description: '豆瓣影视浏览：今日推荐（每日轮换）、热门精选、电影 / 电视剧 / 综艺 / 纪录片、高分佳作、华语 / 港台 / 日韩精选、豆瓣 Top250 与分类片单。纯浏览模块，不带播放源——详情页是豆瓣资料（评分、海报、演职员、简介），播放请用你在 Rex 里绑定的 Emby 库或其他模块。若某个分区提示被登录门拦截，可在模块设置里填入豆瓣 Cookie 后重试。海报若加载不出来，是豆瓣图片防盗链（需要 Referer）：部署配套的海报代理 Worker 后，把代理地址填入「海报代理地址」即可。',
+    description: '豆瓣影视浏览：今日推荐（每日轮换）、热门精选、电影 / 电视剧 / 综艺 / 纪录片、高分佳作、华语 / 港台 / 日韩精选、豆瓣 Top250 与分类片单。纯浏览模块，不带播放源——详情页是豆瓣资料（评分、海报、演职员、简介），播放请用你在 Rex 里绑定的 Emby 库或其他模块。若某个分区提示被登录门拦截，可在模块设置里填入豆瓣 Cookie 后重试。海报由模块在条目里自带豆瓣 Referer 请求头直连加载，一般无需任何设置；若个别海报仍不显示，可部署配套的海报代理 Worker，并把地址填入「海报代理地址」走代理兜底。',
     author: 'v7777',
     site: 'https://movie.douban.com',
-    version: "0.1.1",
+    version: "0.1.2",
     requiredVersion: '0.0.7',
     contentType: 'video',
     iconurl: 'https://img1.doubanio.com/favicon.ico',
@@ -74,7 +74,7 @@ WidgetMetadata = {
             name: 'posterProxy',
             title: '海报代理地址（可选）',
             type: 'input',
-            description: '可选。豆瓣海报有防盗链（无豆瓣 Referer 返回 418），Rex 直接加载会失败。部署配套的 douban-poster-worker.js 到 Cloudflare Workers 后，把「https://你的Worker地址/?url=」整段填进来，模块发出的豆瓣海报会改走代理；留空则直出原地址',
+            description: '可选（备用）。海报正常情况下由模块自带豆瓣 Referer 请求头直连加载，这里留空即可。仅当海报仍然不显示时再填：部署配套的 douban-poster-worker.js 到 Cloudflare Workers 后，把「https://你的Worker地址/?url=」整段填进来，模块发出的豆瓣海报改走代理',
             value: ''
         },
         {
@@ -330,7 +330,7 @@ WidgetMetadata = {
         ]
     }
 };
-let n = '[豆瓣影视]', l = 'https://movie.douban.com';
+let i = '[豆瓣影视]', l = 'https://movie.douban.com';
 function o(e) {
     if (!e) return '未知错误';
     if ('string' == typeof e) return e;
@@ -368,14 +368,23 @@ function g(e, t) {
         Widget.storage.set(e, t);
     } catch (e) {}
 }
-function m(e, t) {
-    var r;
-    let i = (null != e ? e : '').trim();
-    if (!i) return '';
-    let n = (null != (r = null == t ? void 0 : t.posterProxy) ? r : '').trim();
-    return !n || i.startsWith(n) ? i : n + encodeURIComponent(i);
+let m = {
+    Referer: 'https://movie.douban.com/'
+};
+function y() {
+    return {
+        customHeaders: r({}, m),
+        headers: r({}, m)
+    };
 }
-function y(e) {
+function f(e, t) {
+    var r;
+    let n = (null != e ? e : '').trim();
+    if (!n) return '';
+    let i = (null != (r = null == t ? void 0 : t.posterProxy) ? r : '').trim();
+    return !i || n.startsWith(i) ? n : i + encodeURIComponent(n);
+}
+function v(e) {
     if (null == e) return null;
     if ('object' == typeof e) return e;
     if ('string' == typeof e) try {
@@ -383,15 +392,15 @@ function y(e) {
     } catch (e) {}
     return null;
 }
-class f extends Error {
+class h extends Error {
     constructor(e){
         super(e), this.name = 'GateError';
     }
 }
-function v(e) {
+function b(e) {
     return !!e && (e.includes('sec.douban.com') || e.includes('异常请求') || /error\s*008/i.test(e) || e.includes('验证你不是机器人') || e.includes('你的请求过于频繁'));
 }
-function h(e, r, i, l) {
+function $(e, r, n, l) {
     return t(function*() {
         var o;
         r && ('string' == typeof r.cookie && g(c, r.cookie.trim()), 'string' == typeof r.posterProxy && g(d, r.posterProxy.trim()));
@@ -399,20 +408,20 @@ function h(e, r, i, l) {
         for(let r = 0; r < 2; r++){
             let o = 1 === r;
             if (o && !a) break;
-            o && console.log(`${n} ${l} 匿名未取到，带 Cookie 重试: ${e}`);
+            o && console.log(`${i} ${l} 匿名未取到，带 Cookie 重试: ${e}`);
             try {
                 let r = yield function(e, r) {
                     return t(function*() {
-                        let t, i = yield Widget.http.get(e, {
+                        let t, n = yield Widget.http.get(e, {
                             headers: (t = {
                                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
                                 Accept: 'application/json, text/html, */*',
                                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.6',
                                 Referer: 'https://movie.douban.com/'
                             }, r && (t.Cookie = r), t)
-                        }), n = 'number' == typeof (null == i ? void 0 : i.statusCode) ? i.statusCode : 200;
-                        if (n >= 400) throw Error(`HTTP ${n}: ${e}`);
-                        let l = null == i ? void 0 : i.data;
+                        }), i = 'number' == typeof (null == n ? void 0 : n.statusCode) ? n.statusCode : 200;
+                        if (i >= 400) throw Error(`HTTP ${i}: ${e}`);
+                        let l = null == n ? void 0 : n.data;
                         if ('string' == typeof l) return l;
                         if (null == l) return '';
                         try {
@@ -422,187 +431,188 @@ function h(e, r, i, l) {
                         }
                     })();
                 }(e, o ? a : void 0);
-                if (i(r)) return r;
+                if (n(r)) return r;
                 s = r, u = null;
             } catch (e) {
                 u = e, s = null;
             }
         }
-        if (null != s && v(s)) throw new f(`豆瓣返回了机器人验证/登录门页面: ${e}`);
+        if (null != s && b(s)) throw new h(`豆瓣返回了机器人验证/登录门页面: ${e}`);
         if (u) throw u;
         throw Error(`${l} 返回内容不可用: ${e}`);
     })();
 }
-function b(e, r) {
+function j(e, r) {
     return t(function*() {
-        let t = yield h(e, r, (e)=>null != y(e), '接口');
-        return y(t);
+        let t = yield $(e, r, (e)=>null != v(e), '接口');
+        return v(t);
     })();
 }
-function $(e, r) {
+function k(e, r) {
     return t(function*() {
-        return h(e, r, (e)=>e.length > 200 && !v(e), '页面');
+        return $(e, r, (e)=>e.length > 200 && !b(e), '页面');
     })();
 }
-function j(e) {
+function T(e) {
     return 'string' == typeof e ? e.trim() : 'number' == typeof e && Number.isFinite(e) ? String(e) : '';
 }
-function k(e) {
+function P(e) {
     if (!Array.isArray(e)) {
-        let t = j(e);
+        let t = T(e);
         return t ? [
             t
         ] : [];
     }
     let t = [];
-    for (let n of e){
-        var r, i;
-        let e = 'string' == typeof n ? n.trim() : j(null != (r = null != (i = null == n ? void 0 : n.name) ? i : null == n ? void 0 : n.title) ? r : null == n ? void 0 : n.value);
+    for (let i of e){
+        var r, n;
+        let e = 'string' == typeof i ? i.trim() : T(null != (r = null != (n = null == i ? void 0 : i.name) ? n : null == i ? void 0 : i.title) ? r : null == i ? void 0 : i.value);
         e && t.push(e);
     }
     return t;
 }
-function T(e) {
-    let t = j(e);
+function D(e) {
+    let t = T(e);
     if (t) return t;
     if (e && 'object' == typeof e) {
-        var r, i, n;
-        return j(null != (r = null != (i = null != (n = e.value) ? n : e.average) ? i : e.score) ? r : e.rating);
+        var r, n, i;
+        return T(null != (r = null != (n = null != (i = e.value) ? i : e.average) ? n : e.score) ? r : e.rating);
     }
     return '';
 }
-function P(e) {
+function x(e) {
     let t = parseFloat(e.rate);
     return Number.isFinite(t) ? t : 0;
 }
-function x(e, r) {
+function _(e, r) {
     return t(function*() {
-        var t, i, o;
+        var t, n, o;
         let u, s = Number.isFinite(u = parseInt(String(null != (o = e.pageSize) ? o : ''), 10)) ? Math.min(50, Math.max(10, u)) : 24, c = null != (t = r.page) ? t : 1, d = `${l}/j/search_subjects?${a({
             type: r.type,
             tag: r.tag,
-            sort: null != (i = r.sort) ? i : 'recommend',
+            sort: null != (n = r.sort) ? n : 'recommend',
             page_limit: String(s),
             page_start: String((c - 1) * s)
         })}`;
-        console.log(`${n} search_subjects type=${r.type} tag=${r.tag} page=${c}`);
-        let p = yield b(d, e);
+        console.log(`${i} search_subjects type=${r.type} tag=${r.tag} page=${c}`);
+        let p = yield j(d, e);
         return (Array.isArray(null == p ? void 0 : p.subjects) ? p.subjects : []).map((e)=>(function(e, t) {
-                var r, i, n, l;
+                var r, n, i, l;
                 if (!e || 'object' != typeof e) return null;
-                let o = j(e.id), a = j(e.title);
+                let o = T(e.id), a = T(e.title);
                 return o && a ? {
                     id: o,
                     title: a,
-                    rate: T(null != (r = e.rate) ? r : e.rating),
-                    cover: j(null != (i = null != (n = null != (l = e.cover) ? l : e.cover_url) ? n : e.pic) ? i : e.image),
+                    rate: D(null != (r = e.rate) ? r : e.rating),
+                    cover: T(null != (n = null != (i = null != (l = e.cover) ? l : e.cover_url) ? i : e.pic) ? n : e.image),
                     mediaType: t,
-                    directors: k(e.directors),
-                    casts: k(e.casts),
-                    year: j(e.year) || void 0
+                    directors: P(e.directors),
+                    casts: P(e.casts),
+                    year: T(e.year) || void 0
                 } : null;
             })(e, r.type)).filter((e)=>null != e);
     })();
 }
-function D(e, r) {
+function w(e, r) {
     return t(function*() {
-        var t, i, o, u, s, c, d;
+        var t, n, o, u, s, c, d;
         let p = null != (t = r.page) ? t : 1, g = `${l}/j/new_search_subjects?${a({
             sort: 'U',
             range: '0,10',
-            tags: null != (i = r.tags) ? i : '',
+            tags: null != (n = r.tags) ? n : '',
             genres: null != (o = r.genres) ? o : '',
             countries: null != (u = r.countries) ? u : '',
             start: String((p - 1) * 20),
             year_range: ''
         })}`;
-        console.log(`${n} new_search_subjects genres=${null != (s = r.genres) ? s : ''} countries=${null != (c = r.countries) ? c : ''} tags=${null != (d = r.tags) ? d : ''} page=${p}`);
-        let m = yield b(g, e);
+        console.log(`${i} new_search_subjects genres=${null != (s = r.genres) ? s : ''} countries=${null != (c = r.countries) ? c : ''} tags=${null != (d = r.tags) ? d : ''} page=${p}`);
+        let m = yield j(g, e);
         return (Array.isArray(null == m ? void 0 : m.data) ? m.data : Array.isArray(m) ? m : []).map((e)=>(function(e) {
-                var t, r, i, n, l;
+                var t, r, n, i, l;
                 if (!e || 'object' != typeof e) return null;
-                let o = j(e.id), a = j(e.title);
+                let o = T(e.id), a = T(e.title);
                 if (!o || !a) return null;
-                let u = j(null != (t = e.subtype) ? t : e.type);
+                let u = T(null != (t = e.subtype) ? t : e.type);
                 return {
                     id: o,
                     title: a,
-                    rate: T(null != (r = e.rate) ? r : e.rating),
-                    cover: j(null != (i = null != (n = null != (l = e.cover) ? l : e.cover_url) ? n : e.pic) ? i : e.image),
+                    rate: D(null != (r = e.rate) ? r : e.rating),
+                    cover: T(null != (n = null != (i = null != (l = e.cover) ? l : e.cover_url) ? i : e.pic) ? n : e.image),
                     mediaType: 'movie' === u ? 'movie' : 'tv',
-                    directors: k(e.directors),
-                    casts: k(e.casts),
-                    year: j(e.year) || void 0
+                    directors: P(e.directors),
+                    casts: P(e.casts),
+                    year: T(e.year) || void 0
                 };
             })(e)).filter((e)=>null != e);
     })();
 }
-function _(e, r) {
+function M(e, r) {
     return t(function*() {
         let t = `${l}/j/subject_abstract?${a({
             subject_id: r
         })}`;
         return function(e) {
-            var t, r, i, n, l, o, a, u, s, c, d, p, g, m, y, f, v;
+            var t, r, n, i, l, o, a, u, s, c, d, p, g, m, y, f, v;
             if (!e || 'object' != typeof e) return null;
             let h = null != (t = null != (r = e.subject) ? r : e.data) ? t : e;
             if (h && 'object' == typeof h && h.subject && 'object' == typeof h.subject && !h.title && (h = h.subject), !h || 'object' != typeof h) return null;
-            let b = j(h.id), $ = j(null != (i = h.title) ? i : h.name);
+            let b = T(h.id), $ = T(null != (n = h.title) ? n : h.name);
             if (!b && !$) return null;
-            let P = j(h.year);
-            if (!P && Array.isArray(h.pubdates) && h.pubdates.length > 0) {
-                let e = /(\d{4})/.exec(j(h.pubdates[0]));
-                e && (P = e[1]);
+            let j = T(h.year);
+            if (!j && Array.isArray(h.pubdates) && h.pubdates.length > 0) {
+                let e = /(\d{4})/.exec(T(h.pubdates[0]));
+                e && (j = e[1]);
             }
-            let x = h.pic && 'object' == typeof h.pic ? h.pic : {};
+            let k = h.pic && 'object' == typeof h.pic ? h.pic : {};
             return {
                 id: b,
                 title: $,
-                originalTitle: j(null != (n = null != (l = h.original_title) ? l : h.originalTitle) ? n : h.aka_title),
-                year: P,
-                subtype: j(null != (o = h.subtype) ? o : h.type),
-                rate: T(null != (a = h.rate) ? a : h.rating),
-                cover: j(null != (u = null != (s = null != (c = null != (d = h.cover) ? d : x.large) ? c : x.normal) ? s : h.image) ? u : h.poster),
-                genres: k(null != (p = h.genres) ? p : h.types),
-                directors: k(h.directors),
-                casts: k(null != (g = h.casts) ? g : h.actors),
-                countries: k(h.countries),
-                languages: k(h.languages),
-                durations: k(null != (m = h.durations) ? m : h.duration),
-                summary: j(null != (y = null != (f = null != (v = h.summary) ? v : h.intro) ? f : h.abstract) ? y : h.description)
+                originalTitle: T(null != (i = null != (l = h.original_title) ? l : h.originalTitle) ? i : h.aka_title),
+                year: j,
+                subtype: T(null != (o = h.subtype) ? o : h.type),
+                rate: D(null != (a = h.rate) ? a : h.rating),
+                cover: T(null != (u = null != (s = null != (c = null != (d = h.cover) ? d : k.large) ? c : k.normal) ? s : h.image) ? u : h.poster),
+                genres: P(null != (p = h.genres) ? p : h.types),
+                directors: P(h.directors),
+                casts: P(null != (g = h.casts) ? g : h.actors),
+                countries: P(h.countries),
+                languages: P(h.languages),
+                durations: P(null != (m = h.durations) ? m : h.duration),
+                summary: T(null != (y = null != (f = null != (v = h.summary) ? v : h.intro) ? f : h.abstract) ? y : h.description)
             };
-        }((yield b(t, e)));
+        }((yield j(t, e)));
     })();
 }
-function w(e, t, r) {
-    let i = [];
-    e.rate && i.push(`豆瓣评分 ${e.rate}`), e.year && i.push(e.year);
-    let n = [];
-    e.rate && n.push(`豆瓣评分：${e.rate}`), e.directors.length > 0 && n.push(`导演：${e.directors.join('、')}`), e.casts.length > 0 && n.push(`主演：${e.casts.slice(0, 6).join('、')}`), r && n.push(r);
-    let l = m(e.cover, t);
-    return {
+function O(e, t, i) {
+    let l = [];
+    e.rate && l.push(`豆瓣评分 ${e.rate}`), e.year && l.push(e.year);
+    let o = [];
+    e.rate && o.push(`豆瓣评分：${e.rate}`), e.directors.length > 0 && o.push(`导演：${e.directors.join('、')}`), e.casts.length > 0 && o.push(`主演：${e.casts.slice(0, 6).join('、')}`), i && o.push(i);
+    let a = f(e.cover, t);
+    return n(r({
         id: e.id,
         type: 'detail',
         title: e.title,
         link: `douban:${e.id}`,
-        posterPath: l || void 0,
-        coverUrl: l || void 0,
-        backdropPath: l || void 0,
+        posterPath: a || void 0,
+        coverUrl: a || void 0,
+        backdropPath: a || void 0
+    }, a ? y() : {}), {
         rating: e.rate || void 0,
         releaseDate: e.year || void 0,
         mediaType: e.mediaType,
-        subtitle: i.join(' · ') || void 0,
-        description: n.join('\n') || void 0
-    };
+        subtitle: l.join(' · ') || void 0,
+        description: o.join('\n') || void 0
+    });
 }
-function M(e) {
+function R(e) {
     let t = new Map();
     for (let r of e)for (let e of r)t.has(e.id) || t.set(e.id, e);
     return [
         ...t.values()
-    ].sort((e, t)=>P(t) - P(e));
+    ].sort((e, t)=>x(t) - x(e));
 }
-function O(e, l, a) {
+function N(e, l, a) {
     return t(function*() {
         let t = [], u = 0;
         for (let c of l){
@@ -610,13 +620,13 @@ function O(e, l, a) {
             if (u < a) {
                 u++;
                 try {
-                    let t = yield _(e, c.id);
+                    let t = yield M(e, c.id);
                     t && (l = s(t.summary, 140), !d && t.year && (d = t.year), !p && t.rate && (p = t.rate));
                 } catch (e) {
-                    console.log(`${n} 简介补全 ${c.id} 失败（用列表数据）: ${o(e)}`);
+                    console.log(`${i} 简介补全 ${c.id} 失败（用列表数据）: ${o(e)}`);
                 }
             }
-            t.push(w(i(r({}, c), {
+            t.push(O(n(r({}, c), {
                 year: d,
                 rate: p
             }), e, l || void 0));
@@ -624,12 +634,12 @@ function O(e, l, a) {
         return t;
     })();
 }
-function R(e, t) {
-    let r = t instanceof f, i = r ? '接口被登录门拦截（008)，可在模块设置填 Cookie 后重试' : `接口请求失败：${s(o(t), 40)}`;
-    return console.log(`${n} ${e} 失败: ${o(t)}`), {
+function S(e, t) {
+    let r = t instanceof h, n = r ? '接口被登录门拦截（008)，可在模块设置填 Cookie 后重试' : `接口请求失败：${s(o(t), 40)}`;
+    return console.log(`${i} ${e} 失败: ${o(t)}`), {
         id: `diag:${e}`,
         type: 'detail',
-        title: `豆瓣·${e}：${i}`,
+        title: `豆瓣·${e}：${n}`,
         link: 'douban:diag',
         mediaType: 'movie',
         description: [
@@ -639,7 +649,7 @@ function R(e, t) {
         ].join('\n')
     };
 }
-function N(e) {
+function C(e) {
     return t(function*() {
         try {
             return {
@@ -655,315 +665,316 @@ function N(e) {
     })();
 }
 loadToday = (e)=>t(function*() {
-        if (console.log(`${n} loadToday page=${u(e)}`), u(e) > 1) return [];
-        let t = yield N(()=>x(e, {
+        if (console.log(`${i} loadToday page=${u(e)}`), u(e) > 1) return [];
+        let t = yield C(()=>_(e, {
                 type: 'movie',
                 tag: '热门'
-            })), r = yield N(()=>x(e, {
+            })), r = yield C(()=>_(e, {
                 type: 'tv',
                 tag: '热门'
-            })), i = yield N(()=>x(e, {
+            })), n = yield C(()=>_(e, {
                 type: 'tv',
                 tag: '综艺'
-            })), l = yield N(()=>D(e, {
+            })), l = yield C(()=>w(e, {
                 genres: '纪录片'
             })), o = [
             t,
             r,
-            i,
+            n,
             l
         ];
         if (o.every((e)=>0 === e.items.length)) {
             var a;
             let e = null == (a = o.find((e)=>e.err)) ? void 0 : a.err;
             return e ? [
-                R('今日推荐', e)
+                S('今日推荐', e)
             ] : [];
         }
         let s = (e)=>[
                 ...e
-            ].sort((e, t)=>P(t) - P(e)).slice(0, 10), c = M([
+            ].sort((e, t)=>x(t) - x(e)).slice(0, 10), c = R([
             s(t.items),
             s(r.items),
-            s(i.items),
+            s(n.items),
             s(l.items)
         ]), d = function(e) {
             if (e.length <= 8) return e.slice();
             let t = new Date(), r = (Math.floor(Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) / 86400000) % e.length + e.length) % e.length;
             return e.slice(r).concat(e.slice(0, r)).slice(0, 8);
         }(c);
-        return console.log(`${n} loadToday 候选池 ${c.length} 部，今日取 ${d.length} 部`), O(e, d, 8);
+        return console.log(`${i} loadToday 候选池 ${c.length} 部，今日取 ${d.length} 部`), N(e, d, 8);
     })(), loadHotMix = (e)=>t(function*() {
-        if (console.log(`${n} loadHotMix page=${u(e)}`), u(e) > 1) return [];
-        let t = yield N(()=>x(e, {
+        if (console.log(`${i} loadHotMix page=${u(e)}`), u(e) > 1) return [];
+        let t = yield C(()=>_(e, {
                 type: 'movie',
                 tag: '热门'
-            })), r = yield N(()=>x(e, {
+            })), r = yield C(()=>_(e, {
                 type: 'tv',
                 tag: '热门'
             }));
         if (0 === t.items.length && 0 === r.items.length) {
-            var i;
-            let e = null != (i = t.err) ? i : r.err;
+            var n;
+            let e = null != (n = t.err) ? n : r.err;
             return e ? [
-                R('热门精选', e)
+                S('热门精选', e)
             ] : [];
         }
-        return O(e, M([
+        return N(e, R([
             t.items,
             r.items
         ]).slice(0, 12), 10);
     })(), loadMovieRail = (e)=>t(function*() {
         var t, r;
-        let i = 'region' === (null != (t = e.source) ? t : 'tag').trim() ? 'region' : 'tag', l = (null != (r = e.value) ? r : '').trim() || '热门', o = u(e), a = `${l}电影`;
-        console.log(`${n} loadMovieRail source=${i} value=${l} page=${o}`);
+        let n = 'region' === (null != (t = e.source) ? t : 'tag').trim() ? 'region' : 'tag', l = (null != (r = e.value) ? r : '').trim() || '热门', o = u(e), a = `${l}电影`;
+        console.log(`${i} loadMovieRail source=${n} value=${l} page=${o}`);
         try {
-            return ('region' === i ? yield D(e, {
+            return ('region' === n ? yield w(e, {
                 countries: l,
                 tags: '电影',
                 page: o
-            }) : yield x(e, {
+            }) : yield _(e, {
                 type: 'movie',
                 tag: l,
                 page: o
-            })).map((t)=>w(t, e));
+            })).map((t)=>O(t, e));
         } catch (e) {
             return [
-                R(a, e)
+                S(a, e)
             ];
         }
     })(), loadTvRail = (e)=>t(function*() {
         var t;
-        let r = (null != (t = e.tag) ? t : '').trim() || '热门', i = u(e);
-        console.log(`${n} loadTvRail tag=${r} page=${i}`);
+        let r = (null != (t = e.tag) ? t : '').trim() || '热门', n = u(e);
+        console.log(`${i} loadTvRail tag=${r} page=${n}`);
         try {
-            return (yield x(e, {
+            return (yield _(e, {
                 type: 'tv',
                 tag: r,
-                page: i
-            })).map((t)=>w(t, e));
+                page: n
+            })).map((t)=>O(t, e));
         } catch (e) {
             return [
-                R(`${r}剧集`, e)
+                S(`${r}剧集`, e)
             ];
         }
     })(), loadVariety = (e)=>t(function*() {
         var t;
         let r = u(e);
-        console.log(`${n} loadVariety page=${r}`);
-        let i = yield N(()=>x(e, {
+        console.log(`${i} loadVariety page=${r}`);
+        let n = yield C(()=>_(e, {
                 type: 'tv',
                 tag: '综艺',
                 page: r
             }));
-        if (i.items.length > 0) return i.items.map((t)=>w(t, e));
-        console.log(`${n} loadVariety 主路线无结果，走真人秀探索路线`);
-        let l = yield N(()=>D(e, {
+        if (n.items.length > 0) return n.items.map((t)=>O(t, e));
+        console.log(`${i} loadVariety 主路线无结果，走真人秀探索路线`);
+        let l = yield C(()=>w(e, {
                 tags: '电视剧',
                 genres: '真人秀',
                 page: r
             }));
-        if (l.items.length > 0) return l.items.map((t)=>w(t, e));
-        let o = null != (t = l.err) ? t : i.err;
+        if (l.items.length > 0) return l.items.map((t)=>O(t, e));
+        let o = null != (t = l.err) ? t : n.err;
         return o ? [
-            R('综艺', o)
+            S('综艺', o)
         ] : [];
     })(), loadDocumentary = (e)=>t(function*() {
         let t = u(e);
-        console.log(`${n} loadDocumentary page=${t}`);
-        let r = yield N(()=>D(e, {
+        console.log(`${i} loadDocumentary page=${t}`);
+        let r = yield C(()=>w(e, {
                 genres: '纪录片',
                 tags: '电影',
                 page: t
-            })), i = yield N(()=>D(e, {
+            })), n = yield C(()=>w(e, {
                 genres: '纪录片',
                 tags: '电视剧',
                 page: t
-            })), l = M([
+            })), l = R([
             r.items,
-            i.items
+            n.items
         ]);
         if (0 === l.length) {
-            console.log(`${n} loadDocumentary 探索路线无结果，走标签路线`);
-            let u = yield N(()=>x(e, {
+            console.log(`${i} loadDocumentary 探索路线无结果，走标签路线`);
+            let u = yield C(()=>_(e, {
                     type: 'movie',
                     tag: '纪录片',
                     page: t
-                })), c = yield N(()=>x(e, {
+                })), c = yield C(()=>_(e, {
                     type: 'tv',
                     tag: '纪录片',
                     page: t
                 }));
-            if (0 === (l = M([
+            if (0 === (l = R([
                 u.items,
                 c.items
             ])).length) {
                 var o, a, s;
-                let e = null != (o = null != (a = null != (s = u.err) ? s : c.err) ? a : r.err) ? o : i.err;
+                let e = null != (o = null != (a = null != (s = u.err) ? s : c.err) ? a : r.err) ? o : n.err;
                 return e ? [
-                    R('纪录片', e)
+                    S('纪录片', e)
                 ] : [];
             }
         }
-        return l.map((t)=>w(t, e));
+        return l.map((t)=>O(t, e));
     })(), loadHighRated = (e)=>t(function*() {
         let t = u(e);
-        console.log(`${n} loadHighRated page=${t}`);
+        console.log(`${i} loadHighRated page=${t}`);
         try {
-            let r = yield x(e, {
+            let r = yield _(e, {
                 type: 'movie',
                 tag: '豆瓣高分',
                 sort: 'rank',
                 page: t
             });
-            return O(e, r.slice(0, 10), 10);
+            return N(e, r.slice(0, 10), 10);
         } catch (e) {
             return [
-                R('高分佳作', e)
+                S('高分佳作', e)
             ];
         }
     })(), loadMainland = (e)=>t(function*() {
         let t = u(e);
-        console.log(`${n} loadMainland page=${t}`);
-        let r = yield N(()=>D(e, {
+        console.log(`${i} loadMainland page=${t}`);
+        let r = yield C(()=>w(e, {
                 countries: '中国大陆',
                 tags: '电影',
                 page: t
-            })), i = yield N(()=>D(e, {
+            })), n = yield C(()=>w(e, {
                 countries: '中国大陆',
                 tags: '电视剧',
                 page: t
-            })), l = M([
+            })), l = R([
             r.items,
-            i.items
+            n.items
         ]);
         if (0 === l.length) {
-            let n = yield N(()=>D(e, {
+            let i = yield C(()=>w(e, {
                     countries: '中国大陆',
                     page: t
                 }));
-            if (0 === (l = n.items).length) {
+            if (0 === (l = i.items).length) {
                 var o, a, s;
-                let l = yield N(()=>x(e, {
+                let l = yield C(()=>_(e, {
                         type: 'movie',
                         tag: '华语',
                         page: t
                     }));
-                if (l.items.length > 0) return l.items.map((t)=>w(t, e));
-                let u = null != (o = null != (a = null != (s = l.err) ? s : n.err) ? a : r.err) ? o : i.err;
+                if (l.items.length > 0) return l.items.map((t)=>O(t, e));
+                let u = null != (o = null != (a = null != (s = l.err) ? s : i.err) ? a : r.err) ? o : n.err;
                 return u ? [
-                    R('华语精选', u)
+                    S('华语精选', u)
                 ] : [];
             }
         }
-        return l.map((t)=>w(t, e));
+        return l.map((t)=>O(t, e));
     })(), loadHkTw = (e)=>t(function*() {
         let t = u(e);
-        console.log(`${n} loadHkTw page=${t}`);
-        let r = yield N(()=>D(e, {
+        console.log(`${i} loadHkTw page=${t}`);
+        let r = yield C(()=>w(e, {
                 countries: '中国香港',
                 tags: '电影',
                 page: t
-            })), i = yield N(()=>D(e, {
+            })), n = yield C(()=>w(e, {
                 countries: '中国台湾',
                 tags: '电影',
                 page: t
-            })), l = M([
+            })), l = R([
             r.items,
-            i.items
+            n.items
         ]);
         if (0 === l.length) {
-            let n = yield N(()=>D(e, {
+            let i = yield C(()=>w(e, {
                     countries: '中国香港',
                     page: t
-                })), u = yield N(()=>D(e, {
+                })), u = yield C(()=>w(e, {
                     countries: '中国台湾',
                     page: t
                 }));
-            if (0 === (l = M([
-                n.items,
+            if (0 === (l = R([
+                i.items,
                 u.items
             ])).length) {
                 var o, a, s;
-                let e = null != (o = null != (a = null != (s = n.err) ? s : u.err) ? a : r.err) ? o : i.err;
+                let e = null != (o = null != (a = null != (s = i.err) ? s : u.err) ? a : r.err) ? o : n.err;
                 return e ? [
-                    R('港台精选', e)
+                    S('港台精选', e)
                 ] : [];
             }
         }
-        return l.map((t)=>w(t, e));
+        return l.map((t)=>O(t, e));
     })(), loadJpKr = (e)=>t(function*() {
         let t = u(e);
-        console.log(`${n} loadJpKr page=${t}`);
-        let r = yield N(()=>x(e, {
+        console.log(`${i} loadJpKr page=${t}`);
+        let r = yield C(()=>_(e, {
                 type: 'movie',
                 tag: '韩国',
                 page: t
-            })), i = yield N(()=>x(e, {
+            })), n = yield C(()=>_(e, {
                 type: 'movie',
                 tag: '日本',
                 page: t
-            })), l = M([
+            })), l = R([
             r.items,
-            i.items
+            n.items
         ]);
         if (0 === l.length) {
             var o;
-            let e = null != (o = r.err) ? o : i.err;
+            let e = null != (o = r.err) ? o : n.err;
             return e ? [
-                R('日韩精选', e)
+                S('日韩精选', e)
             ] : [];
         }
-        return l.map((t)=>w(t, e));
+        return l.map((t)=>O(t, e));
     })(), loadTop250 = (e)=>t(function*() {
-        let r = u(e), i = (r - 1) * 25;
-        console.log(`${n} loadTop250 page=${r} start=${i}`);
-        let a = null;
+        let a = u(e), s = (a - 1) * 25;
+        console.log(`${i} loadTop250 page=${a} start=${s}`);
+        let c = null;
         try {
-            let r = yield $(`${l}/top250?start=${i}`, e), o = yield t(function*() {
-                let t = yield Widget.html.load(r), i = [];
-                return t('.item').each((r, n)=>{
-                    var l, o, a, u;
-                    let s = t(n), c = null != (l = null != (o = s.find('.pic a').first().attr('href')) ? o : s.find('a').first().attr('href')) ? l : '', d = /subject\/(\d+)/.exec(c);
-                    if (!d) return;
-                    let p = d[1], g = s.find('.hd .title').first().text().trim() || s.find('.title').first().text().trim();
+            let o = yield k(`${l}/top250?start=${s}`, e), a = yield t(function*() {
+                let t = yield Widget.html.load(o), i = [];
+                return t('.item').each((l, o)=>{
+                    var a, u, s, c;
+                    let d = t(o), p = null != (a = null != (u = d.find('.pic a').first().attr('href')) ? u : d.find('a').first().attr('href')) ? a : '', g = /subject\/(\d+)/.exec(p);
                     if (!g) return;
-                    let y = m(null != (a = s.find('.pic img').first().attr('src')) ? a : '', e), f = s.find('.rating_num').first().text().trim(), v = null != (u = s.find('.bd p').first().text().replace(/\s+/g, ' ').trim().split('<br>').join(' ').split(/\s{2,}/).pop()) ? u : '', h = /(\d{4})/.exec(v), b = s.find('.inq').first().text().trim(), $ = [];
-                    f && $.push(`豆瓣评分：${f}`), v && $.push(v), b && $.push(b), i.push({
-                        id: p,
+                    let m = g[1], v = d.find('.hd .title').first().text().trim() || d.find('.title').first().text().trim();
+                    if (!v) return;
+                    let h = f(null != (s = d.find('.pic img').first().attr('src')) ? s : '', e), b = d.find('.rating_num').first().text().trim(), $ = null != (c = d.find('.bd p').first().text().replace(/\s+/g, ' ').trim().split('<br>').join(' ').split(/\s{2,}/).pop()) ? c : '', j = /(\d{4})/.exec($), k = d.find('.inq').first().text().trim(), T = [];
+                    b && T.push(`豆瓣评分：${b}`), $ && T.push($), k && T.push(k), i.push(n(r({
+                        id: m,
                         type: 'detail',
-                        title: g,
-                        link: `douban:${p}`,
-                        posterPath: y || void 0,
-                        coverUrl: y || void 0,
-                        backdropPath: y || void 0,
-                        rating: f || void 0,
-                        releaseDate: h ? h[1] : void 0,
+                        title: v,
+                        link: `douban:${m}`,
+                        posterPath: h || void 0,
+                        coverUrl: h || void 0,
+                        backdropPath: h || void 0
+                    }, h ? y() : {}), {
+                        rating: b || void 0,
+                        releaseDate: j ? j[1] : void 0,
                         mediaType: 'movie',
-                        subtitle: f ? `豆瓣评分 ${f}` : void 0,
-                        description: $.join('\n') || void 0
-                    });
+                        subtitle: b ? `豆瓣评分 ${b}` : void 0,
+                        description: T.join('\n') || void 0
+                    }));
                 }), i;
             })();
-            if (o.length > 0) return o;
-            console.log(`${n} loadTop250 HTML 解析出 0 条，走经典标签路线`);
+            if (a.length > 0) return a;
+            console.log(`${i} loadTop250 HTML 解析出 0 条，走经典标签路线`);
         } catch (e) {
-            a = e, console.log(`${n} loadTop250 HTML 路线失败，走经典标签路线: ${o(e)}`);
+            c = e, console.log(`${i} loadTop250 HTML 路线失败，走经典标签路线: ${o(e)}`);
         }
         try {
-            return (yield x(e, {
+            return (yield _(e, {
                 type: 'movie',
                 tag: '经典',
                 sort: 'rank',
-                page: r
-            })).map((t)=>w(t, e));
+                page: a
+            })).map((t)=>O(t, e));
         } catch (e) {
             return [
-                R('豆瓣 Top250', null != a ? a : e)
+                S('豆瓣 Top250', null != c ? c : e)
             ];
         }
     })();
-let S = [
+let A = [
     '剧情',
     '喜剧',
     '动作',
@@ -971,48 +982,48 @@ let S = [
     '动画',
     '悬疑'
 ];
-function C(e) {
+function I(e) {
     let t = (null != e ? e : '').trim();
     return t.startsWith('douban:genre:') ? t.slice(13).trim() : t;
 }
 loadGenres = (e)=>t(function*() {
         var t, l;
-        let o = C(null != (t = e.genreId) ? t : '');
-        if (o) return console.log(`${n} loadGenres 收到 genreId=${o}，转分类片单`), loadGenrePage(i(r({}, e), {
+        let o = I(null != (t = e.genreId) ? t : '');
+        if (o) return console.log(`${i} loadGenres 收到 genreId=${o}，转分类片单`), loadGenrePage(n(r({}, e), {
             genre: o
         }));
-        console.log(`${n} loadGenres 无 genreId，返回多类型融合片单`);
+        console.log(`${i} loadGenres 无 genreId，返回多类型融合片单`);
         let a = [];
-        for (let t of S)a.push((yield N(()=>D(e, {
+        for (let t of A)a.push((yield C(()=>w(e, {
                 genres: t
             }))));
-        let u = M(a.map((e)=>e.items)).slice(0, 18);
+        let u = R(a.map((e)=>e.items)).slice(0, 18);
         if (0 === u.length) {
             let e = null == (l = a.find((e)=>e.err)) ? void 0 : l.err;
             return e ? [
-                R('分类浏览', e)
+                S('分类浏览', e)
             ] : [];
         }
-        return u.map((t)=>w(t, e));
+        return u.map((t)=>O(t, e));
     })(), loadGenrePage = (e)=>t(function*() {
         var t, r;
-        let i = (null != (t = e.genre) ? t : '').trim() || C(null != (r = e.genreId) ? r : '') || '剧情', l = u(e);
-        console.log(`${n} loadGenrePage genre=${i} page=${l}`);
+        let n = (null != (t = e.genre) ? t : '').trim() || I(null != (r = e.genreId) ? r : '') || '剧情', l = u(e);
+        console.log(`${i} loadGenrePage genre=${n} page=${l}`);
         try {
-            return (yield D(e, {
-                genres: i,
+            return (yield w(e, {
+                genres: n,
                 page: l
-            })).map((t)=>w(t, e));
+            })).map((t)=>O(t, e));
         } catch (e) {
             return [
-                R(`分类·${i}`, e)
+                S(`分类·${n}`, e)
             ];
         }
     })(), loadDetail = (e, a)=>t(function*() {
-        var u, g, y, v, h;
-        let b, k, T = (null != e ? e : '').trim();
-        if (!T) return [];
-        if ('douban:diag' === T) return {
+        var u, g, m, v, b;
+        let $, j, P = (null != e ? e : '').trim();
+        if (!P) return [];
+        if ('douban:diag' === P) return {
             id: 'diag:about',
             type: 'detail',
             title: '豆瓣影视 · 说明',
@@ -1020,88 +1031,88 @@ loadGenres = (e)=>t(function*() {
             mediaType: 'movie',
             description: "这是「豆瓣影视」纯浏览模块：分区数据来自豆瓣公开接口，详情页只有资料（评分、海报、演职员、简介），不带播放源。\n播放请用你在 Rex 里绑定的 Emby 库或其他模块——在那些模块的详情页选片即可。\n若某个分区提示被登录门拦截（008)：在浏览器登录 movie.douban.com，复制完整 Cookie 填到本模块设置里再刷新；模块只会在被拦截时带 Cookie 重试一次，平时匿名取数。"
         };
-        let P = '';
-        if (T.startsWith('douban:')) {
-            let e = T.slice(7).trim();
-            /^\d+$/.test(e) && (P = e);
+        let D = '';
+        if (P.startsWith('douban:')) {
+            let e = P.slice(7).trim();
+            /^\d+$/.test(e) && (D = e);
         }
-        if (!P) {
-            let e = /subject\/(\d+)/.exec(T);
-            e && (P = e[1]);
+        if (!D) {
+            let e = /subject\/(\d+)/.exec(P);
+            e && (D = e[1]);
         }
-        if (!P) return [];
-        let x = (k = {
+        if (!D) return [];
+        let x = (j = {
             cookie: p(c),
             posterProxy: p(d)
-        }, a && ('string' == typeof a.cookie && (k.cookie = a.cookie), 'string' == typeof a.posterProxy && (k.posterProxy = a.posterProxy), 'string' == typeof a.pageSize && (k.pageSize = a.pageSize)), k), D = `${l}/subject/${P}/`, w = null, M = null;
+        }, a && ('string' == typeof a.cookie && (j.cookie = a.cookie), 'string' == typeof a.posterProxy && (j.posterProxy = a.posterProxy), 'string' == typeof a.pageSize && (j.pageSize = a.pageSize)), j), _ = `${l}/subject/${D}/`, w = null, O = null;
         try {
-            w = yield _(x, P);
+            w = yield M(x, D);
         } catch (e) {
-            M = e;
+            O = e;
         }
-        if (!w) return console.log(`${n} loadDetail ${P} 详情不可用: ${M ? o(M) : '无数据'}`), {
-            id: P,
+        if (!w) return console.log(`${i} loadDetail ${D} 详情不可用: ${O ? o(O) : '无数据'}`), {
+            id: D,
             type: 'detail',
-            title: `豆瓣条目 ${P}`,
-            link: `douban:${P}`,
+            title: `豆瓣条目 ${D}`,
+            link: `douban:${D}`,
             mediaType: 'movie',
             description: [
-                M instanceof f ? '豆瓣详情接口被登录门拦截（008)。可在模块设置里填入豆瓣 Cookie 后重试。' : '这次没能从豆瓣取到该条目的详情，可以稍后重试。',
-                `豆瓣页面：${D}`
+                O instanceof h ? '豆瓣详情接口被登录门拦截（008)。可在模块设置里填入豆瓣 Cookie 后重试。' : '这次没能从豆瓣取到该条目的详情，可以稍后重试。',
+                `豆瓣页面：${_}`
             ].join('\n')
         };
-        let O = yield (g = P, t(function*() {
+        let R = yield (g = D, t(function*() {
             try {
-                let e = yield $(`${l}/subject/${g}/`, x), t = yield Widget.html.load(e), r = t('#info').text().replace(/\s+/g, ' '), i = '', o = /(tt\d{7,8})/.exec(r);
-                if (o && (i = o[1]), !i) {
+                let e = yield k(`${l}/subject/${g}/`, x), t = yield Widget.html.load(e), r = t('#info').text().replace(/\s+/g, ' '), n = '', o = /(tt\d{7,8})/.exec(r);
+                if (o && (n = o[1]), !n) {
                     let t = /imdb\.com\/title\/(tt\d{7,8})/.exec(e);
-                    t && (i = t[1]);
+                    t && (n = t[1]);
                 }
                 let a = '', u = /(?:单集片长|片长)[:：]\s*([0-9]+\s*分钟(?:\s*[0-9]+\s*秒)?)/.exec(r);
                 u && (a = u[1].replace(/\s+/g, ''));
                 let s = t('span[property="v:summary"]').first().text().replace(/\s+/g, ' ').trim(), c = [];
                 return t('span[property="v:genre"]').each((e, r)=>{
-                    let i = t(r).text().trim();
-                    i && c.push(i);
-                }), console.log(`${n} 条目页 ${g} 解析：IMDb=${i || '无'} 片长=${a || '无'} 类型=${c.length}个`), {
-                    imdbId: i,
+                    let n = t(r).text().trim();
+                    n && c.push(n);
+                }), console.log(`${i} 条目页 ${g} 解析：IMDb=${n || '无'} 片长=${a || '无'} 类型=${c.length}个`), {
+                    imdbId: n,
                     runtimeText: a,
                     summary: s,
                     genres: c
                 };
             } catch (e) {
-                return console.log(`${n} 条目页 ${g} 解析失败（用摘要数据）: ${o(e)}`), null;
+                return console.log(`${i} 条目页 ${g} 解析失败（用摘要数据）: ${o(e)}`), null;
             }
         })());
-        O && (!w.summary && O.summary && (w.summary = O.summary), 0 === w.genres.length && O.genres.length > 0 && (w.genres = O.genres));
-        let R = null != (u = null == O ? void 0 : O.imdbId) ? u : '', N = 'tv' === w.subtype ? 'tv' : 'movie', S = R ? yield (y = 'tv' === N, t(function*() {
+        R && (!w.summary && R.summary && (w.summary = R.summary), 0 === w.genres.length && R.genres.length > 0 && (w.genres = R.genres));
+        let N = null != (u = null == R ? void 0 : R.imdbId) ? u : '', S = 'tv' === w.subtype ? 'tv' : 'movie', C = N ? yield (m = 'tv' === S, t(function*() {
             try {
-                let e = yield Widget.tmdb.get(`/find/${R}`, {
+                let e = yield Widget.tmdb.get(`/find/${N}`, {
                     params: {
                         external_source: 'imdb_id'
                     }
                 }), t = Array.isArray(null == e ? void 0 : e.movie_results) ? e.movie_results : [], r = Array.isArray(null == e ? void 0 : e.tv_results) ? e.tv_results : [];
-                for (let e of y ? [
+                for (let e of m ? [
                     ...r,
                     ...t
                 ] : [
                     ...t,
                     ...r
                 ]){
-                    let t = j(null == e ? void 0 : e.id);
+                    let t = T(null == e ? void 0 : e.id);
                     if (t) return {
                         id: t,
-                        posterPath: j(null == e ? void 0 : e.poster_path),
-                        backdropPath: j(null == e ? void 0 : e.backdrop_path)
+                        posterPath: T(null == e ? void 0 : e.poster_path),
+                        backdropPath: T(null == e ? void 0 : e.backdrop_path)
                     };
                 }
                 return null;
             } catch (e) {
-                return console.log(`${n} TMDB find ${R} 失败: ${o(e)}`), null;
+                return console.log(`${i} TMDB find ${N} 失败: ${o(e)}`), null;
             }
         })()) : null;
-        S ? console.log(`${n} loadDetail ${P} 身份命中：TMDB ${S.id}（经 IMDb ${R}）`) : R && console.log(`${n} loadDetail ${P} 有 IMDb ${R}，TMDB 未命中，仅带 IMDb 身份`);
-        let C = (null == O ? void 0 : O.runtimeText) || w.durations[0] || '', A = [
+        C ? console.log(`${i} loadDetail ${D} 身份命中：TMDB ${C.id}（经 IMDb ${N}）`) : N && console.log(`${i} loadDetail ${D} 有 IMDb ${N}，TMDB 未命中，仅带 IMDb 身份`);
+        let A = (null == R ? void 0 : R.runtimeText) || w.durations[0] || '', I = [
             ...w.directors.map((e)=>({
                     id: e,
                     title: e,
@@ -1112,90 +1123,91 @@ loadGenres = (e)=>t(function*() {
                     title: e,
                     role: '演员'
                 }))
-        ], I = [];
-        w.year && I.push(w.year), w.countries.length > 0 && I.push(w.countries.join(' / ')), w.languages.length > 0 && I.push(w.languages.join(' / ')), C ? I.push(C) : w.durations.length > 0 && I.push(w.durations.join(' / '));
-        let H = [];
-        w.originalTitle && w.originalTitle !== w.title && H.push(`原名：${w.originalTitle}`), w.rate && H.push(`豆瓣评分：${w.rate}`), I.length > 0 && H.push(I.join(' · ')), w.summary && H.push(`简介：${s(w.summary, 600)}`);
-        let W = m(w.cover, x);
-        b = S && S.posterPath ? {
-            posterPath: S.posterPath,
-            detailPoster: S.posterPath,
-            coverUrl: `https://image.tmdb.org/t/p/w500${S.posterPath}`,
-            backdropPath: S.backdropPath || S.posterPath
-        } : S ? {
-            coverUrl: W || void 0,
-            backdropPath: W || void 0
-        } : {
-            posterPath: W || void 0,
-            detailPoster: w.cover ? m((v = w.cover) ? v.replace('s_ratio_poster', 'l_ratio_poster') : v, x) : void 0,
-            coverUrl: W || void 0,
-            backdropPath: W || void 0
-        };
-        let G = function(e) {
+        ], H = [];
+        w.year && H.push(w.year), w.countries.length > 0 && H.push(w.countries.join(' / ')), w.languages.length > 0 && H.push(w.languages.join(' / ')), A ? H.push(A) : w.durations.length > 0 && H.push(w.durations.join(' / '));
+        let W = [];
+        w.originalTitle && w.originalTitle !== w.title && W.push(`原名：${w.originalTitle}`), w.rate && W.push(`豆瓣评分：${w.rate}`), H.length > 0 && W.push(H.join(' · ')), w.summary && W.push(`简介：${s(w.summary, 600)}`);
+        let G = f(w.cover, x);
+        $ = C && C.posterPath ? {
+            posterPath: C.posterPath,
+            detailPoster: C.posterPath,
+            coverUrl: `https://image.tmdb.org/t/p/w500${C.posterPath}`,
+            backdropPath: C.backdropPath || C.posterPath
+        } : C ? r({
+            coverUrl: G || void 0,
+            backdropPath: G || void 0
+        }, G ? y() : {}) : r({
+            posterPath: G || void 0,
+            detailPoster: w.cover ? f((v = w.cover) ? v.replace('s_ratio_poster', 'l_ratio_poster') : v, x) : void 0,
+            coverUrl: G || void 0,
+            backdropPath: G || void 0
+        }, G ? y() : {});
+        let U = function(e) {
             let t = /^(\d+)分钟$/.exec((null != e ? e : '').replace(/\s+/g, ''));
             if (!t) return;
             let r = parseInt(t[1], 10);
             return Number.isFinite(r) && r > 0 ? 60 * r : void 0;
-        }(C), U = r(i(r({
-            id: S ? S.id : P,
-            type: S ? 'tmdb' : 'detail',
-            title: String(null != (h = w.title) ? h : '').replace(/\s*[（(]\s*\d{4}\s*[)）]\s*$/, '').trim() || `豆瓣条目 ${P}`,
-            link: `douban:${P}`
-        }, b), {
+        }(A), E = r(n(r({
+            id: C ? C.id : D,
+            type: C ? 'tmdb' : 'detail',
+            title: String(null != (b = w.title) ? b : '').replace(/\s*[（(]\s*\d{4}\s*[)）]\s*$/, '').trim() || `豆瓣条目 ${D}`,
+            link: `douban:${D}`
+        }, $), {
             rating: w.rate || void 0,
             releaseDate: w.year || void 0,
-            mediaType: N,
+            mediaType: S,
             genreTitle: w.genres.length > 0 ? w.genres.join(' / ') : void 0,
             genreItems: w.genres.length > 0 ? w.genres.map((e)=>({
                     id: e,
                     title: e
                 })) : void 0,
-            peoples: A.length > 0 ? A : void 0,
-            description: H.join('\n') || void 0
-        }), C ? {
-            durationText: C
-        } : {}, G ? {
-            duration: G
+            peoples: I.length > 0 ? I : void 0,
+            description: W.join('\n') || void 0
+        }), A ? {
+            durationText: A
+        } : {}, U ? {
+            duration: U
         } : {});
-        return S && (U.tmdbId = S.id), R && (U.imdbId = R), U;
+        return C && (E.tmdbId = C.id), N && (E.imdbId = N), E;
     })(), loadResource = (e)=>t(function*() {
-        return console.log(`${n} loadResource 被调用（纯浏览模块，无播放源，返回空）`), [];
+        return console.log(`${i} loadResource 被调用（纯浏览模块，无播放源，返回空）`), [];
     })(), search = (e)=>t(function*() {
-        var t, r, i, o, u;
-        let s = (null != (t = null != (r = null != (i = e.keyword) ? i : e.title) ? r : e.query) ? t : '').trim();
-        if (!s) return [];
-        console.log(`${n} search q=${s}`);
+        var t, o, u, s, c;
+        let d = (null != (t = null != (o = null != (u = e.keyword) ? u : e.title) ? o : e.query) ? t : '').trim();
+        if (!d) return [];
+        console.log(`${i} search q=${d}`);
         try {
             let t = `${l}/j/subject_suggest?${a({
-                q: s
-            })}`, r = yield b(t, e), i = Array.isArray(r) ? r : Array.isArray(null == r ? void 0 : r.subjects) ? r.subjects : [], n = [];
-            for (let t of i){
-                let r = j(null != (o = null == t ? void 0 : t.type) ? o : 'movie');
-                if ('movie' !== r && 'tv' !== r) continue;
-                let i = j(null == t ? void 0 : t.id), l = j(null == t ? void 0 : t.title);
-                if (!i || !l) continue;
-                let a = m(j(null != (u = null == t ? void 0 : t.img) ? u : null == t ? void 0 : t.cover), e), s = j(null == t ? void 0 : t.year), c = j(null == t ? void 0 : t.sub_title);
-                n.push({
-                    id: i,
+                q: d
+            })}`, i = yield j(t, e), o = Array.isArray(i) ? i : Array.isArray(null == i ? void 0 : i.subjects) ? i.subjects : [], u = [];
+            for (let t of o){
+                let i = T(null != (s = null == t ? void 0 : t.type) ? s : 'movie');
+                if ('movie' !== i && 'tv' !== i) continue;
+                let l = T(null == t ? void 0 : t.id), o = T(null == t ? void 0 : t.title);
+                if (!l || !o) continue;
+                let a = f(T(null != (c = null == t ? void 0 : t.img) ? c : null == t ? void 0 : t.cover), e), d = T(null == t ? void 0 : t.year), p = T(null == t ? void 0 : t.sub_title);
+                u.push(n(r({
+                    id: l,
                     type: 'detail',
-                    title: l,
-                    link: `douban:${i}`,
+                    title: o,
+                    link: `douban:${l}`,
                     posterPath: a || void 0,
                     coverUrl: a || void 0,
-                    backdropPath: a || void 0,
-                    releaseDate: s || void 0,
-                    mediaType: 'tv' === r ? 'tv' : 'movie',
+                    backdropPath: a || void 0
+                }, a ? y() : {}), {
+                    releaseDate: d || void 0,
+                    mediaType: 'tv' === i ? 'tv' : 'movie',
                     subtitle: [
-                        s,
-                        c
+                        d,
+                        p
                     ].filter(Boolean).join(' · ') || void 0,
-                    description: c ? `原名：${c}` : void 0
-                });
+                    description: p ? `原名：${p}` : void 0
+                }));
             }
-            return n;
+            return u;
         } catch (e) {
             return [
-                R('搜索', e)
+                S('搜索', e)
             ];
         }
     })();
